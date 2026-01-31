@@ -46,7 +46,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         body {
-            background-color: #f8fafc;
+            background-color: #f8fafc; /* Very light gray background */
         }
 
         /* Custom Scrollbar */
@@ -135,10 +135,13 @@
             color: white;
         }
 
-        /* Row Hover Effect */
+        /* Row Hover Effect & Blue Lines */
         .match-row {
             transition: all 0.2s ease;
-            border-left: 3px solid transparent;
+            border-bottom: 1px solid #dbeafe; /* Blue lines in rows */
+        }
+        .match-row:last-child {
+            border-bottom: none;
         }
         .match-row:hover {
             background-color: #ffffff !important;
@@ -147,6 +150,18 @@
             border-left: 3px solid #1E6FFF;
             z-index: 5;
             position: relative;
+        }
+        
+        /* Comparison Modal Stat Bar */
+        .stat-bar-bg {
+            background-color: #f1f5f9;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -295,11 +310,12 @@
         <div id="viewDashboard" class="transition-opacity duration-300">
             <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex flex-col" id="tableExportWrapper">
                 <div class="table-container overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200" id="matchesTable">
-                        <!-- Redesigned Header: Gradient & Gold Line -->
+                    <table class="min-w-full" id="matchesTable">
+                        <!-- Redesigned Header -->
                         <thead class="bg-gradient-to-r from-navy-900 to-brand-blue text-white border-b-2 border-brand-gold/60">
                             <tr>
                                 <th class="px-5 py-5 text-left text-xs font-bold uppercase tracking-wider whitespace-nowrap">Date</th>
+                                <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Action</th> <!-- Action moved here -->
                                 <th class="px-5 py-5 text-left text-xs font-bold uppercase tracking-wider whitespace-nowrap">League</th>
                                 <th class="px-5 py-5 text-left text-xs font-bold uppercase tracking-wider whitespace-nowrap">Match</th>
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Odds</th>
@@ -308,10 +324,9 @@
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Pred</th>
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Goals</th>
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Result</th>
-                                <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-100 text-sm" id="tableBody">
+                        <tbody class="bg-white text-sm" id="tableBody">
                             <!-- Rows rendered via JS -->
                         </tbody>
                     </table>
@@ -351,7 +366,7 @@
             <div class="flex items-center justify-between mb-2">
                 <div>
                     <h3 class="text-xl font-bold text-navy-900">Performance Insights</h3>
-                    <p class="text-sm text-gray-500">Visual breakdown of model accuracy and trends.</p>
+                    <p class="text-sm text-gray-500">Visual breakdown of model accuracy and trends across <span class="font-bold text-brand-blue">All Matches</span>.</p>
                 </div>
                 <div class="bg-blue-50 text-brand-blue px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
                     Live Data
@@ -439,131 +454,182 @@
         </div>
     </div>
 
-    <!-- Match Details Modal -->
-    <div id="matchDetailsModal" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full mx-auto my-4 overflow-hidden transform transition-all border border-gray-600">
+    <!-- Match Details Modal (New Compact & Complete Design) -->
+    <div id="matchDetailsModal" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <!-- Max-width reduced from 5xl to 3xl for compactness -->
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-auto overflow-hidden transform transition-all border border-gray-600 max-h-[95vh] flex flex-col">
             <!-- Modal Header -->
-            <div class="bg-navy-900 text-white p-6 relative overflow-hidden">
-                <!-- Background pattern -->
-                <div class="absolute top-0 right-0 p-4 opacity-5">
-                    <i class="fa-solid fa-futbol text-9xl"></i>
-                </div>
-                
-                <button onclick="closeModal('matchDetailsModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <div class="bg-gradient-to-r from-navy-900 to-[#1E6FFF] text-white p-4 relative shrink-0">
+                <button onclick="closeModal('matchDetailsModal')" class="absolute top-3 right-3 text-white/70 hover:text-white transition z-20"><i class="fa-solid fa-xmark text-xl"></i></button>
                 <div class="text-center relative z-10">
-                    <div class="text-xs font-bold text-brand-gold uppercase tracking-widest mb-2" id="md_league">PREMIER LEAGUE</div>
-                    <div class="text-gray-400 text-xs mb-6" id="md_date">2023-10-15</div>
-                    <div class="flex items-center justify-center gap-8">
-                        <div class="text-right w-1/3">
-                            <h2 class="text-2xl md:text-3xl font-bold leading-tight" id="md_home">Home Team</h2>
+                    <div class="flex justify-center items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold text-brand-gold uppercase tracking-widest bg-black/20 px-2 py-0.5 rounded" id="md_league">PREMIER LEAGUE</span>
+                        <span class="text-[10px] font-medium text-blue-100" id="md_date">2023-10-15</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-center gap-4 mt-2">
+                        <div class="text-right w-5/12">
+                            <h2 class="text-lg font-bold leading-tight truncate" id="md_home">Home Team</h2>
                         </div>
-                        <div class="bg-slate-800 px-5 py-3 rounded-xl border border-slate-700 shadow-lg">
-                            <span class="text-3xl font-mono font-bold text-brand-blue" id="md_score">VS</span>
+                        <div class="bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg border border-white/20 shadow-lg">
+                            <span class="text-xl font-mono font-bold text-white" id="md_score">VS</span>
                         </div>
-                        <div class="text-left w-1/3">
-                            <h2 class="text-2xl md:text-3xl font-bold leading-tight" id="md_away">Away Team</h2>
+                        <div class="text-left w-5/12">
+                            <h2 class="text-lg font-bold leading-tight truncate" id="md_away">Away Team</h2>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Body -->
-            <div class="p-8 bg-gray-50">
-                <!-- Key Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                    <!-- Home Stats -->
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-l-4 border-navy-900 shadow-sm">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Power</span>
-                            <span class="font-bold text-xl text-navy-900" id="md_h_power">-</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-l-4 border-gray-300 shadow-sm">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Form</span>
-                            <span class="font-bold text-xl text-navy-900" id="md_h_form">-</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-l-4 border-gray-300 shadow-sm">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Pos</span>
-                            <span class="font-bold text-xl text-navy-900" id="md_h_pos">-</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-l-4 border-brand-green shadow-sm">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Scored Avg</span>
-                            <span class="font-bold text-xl text-brand-green" id="md_h_sc_avg">-</span>
-                        </div>
+            <!-- Modal Body: Scrollable Content -->
+            <div class="p-4 bg-gray-50 overflow-y-auto flex-grow">
+                <div class="space-y-4">
+                    
+                    <!-- 1. Team Stats Grid (Side-by-Side) -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                         <div class="flex items-center justify-center mb-2">
+                             <div class="h-px bg-gray-200 flex-1"></div>
+                             <span class="px-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Team Stats</span>
+                             <div class="h-px bg-gray-200 flex-1"></div>
+                         </div>
+                         <!-- Headers -->
+                         <div class="grid grid-cols-3 gap-2 text-[10px] font-bold text-gray-400 uppercase text-center mb-1">
+                            <div class="text-right pr-2">Home</div>
+                            <div>Metric</div>
+                            <div class="text-left pl-2">Away</div>
+                         </div>
+                         
+                         <!-- Row: Form -->
+                         <div class="grid grid-cols-3 gap-2 items-center py-1 border-b border-gray-50">
+                             <div class="text-right font-bold text-navy-900 pr-2" id="md_h_form">-</div>
+                             <div class="text-center text-xs text-brand-blue font-medium">Form</div>
+                             <div class="text-left font-bold text-navy-900 pl-2" id="md_a_form">-</div>
+                         </div>
+                         <!-- Row: Position -->
+                         <div class="grid grid-cols-3 gap-2 items-center py-1 border-b border-gray-50">
+                             <div class="text-right font-bold text-navy-900 pr-2" id="md_h_pos">-</div>
+                             <div class="text-center text-xs text-brand-blue font-medium">Position</div>
+                             <div class="text-left font-bold text-navy-900 pl-2" id="md_a_pos">-</div>
+                         </div>
+                         <!-- Row: Power -->
+                         <div class="grid grid-cols-3 gap-2 items-center py-1">
+                             <div class="text-right font-bold text-navy-900 pr-2" id="md_h_power">-</div>
+                             <div class="text-center text-xs text-brand-blue font-medium">Power</div>
+                             <div class="text-left font-bold text-navy-900 pl-2" id="md_a_power">-</div>
+                         </div>
                     </div>
 
-                    <!-- Comparison Center -->
-                    <div class="flex flex-col gap-4">
-                        <div class="bg-white border-2 border-brand-blue/20 p-6 rounded-2xl text-center shadow-lg transform scale-105">
-                            <div class="text-brand-blue text-3xl mb-2"><i class="fa-solid fa-crosshairs"></i></div>
-                            <p class="text-xs text-brand-blue font-bold uppercase tracking-widest mb-1">Model Prediction</p>
-                            <div class="text-3xl font-black text-navy-900 mb-2" id="md_prediction">-</div>
-                            <div class="inline-block bg-blue-50 text-brand-blue px-3 py-1 rounded-full text-sm font-bold border border-blue-100" id="md_prob">Prob: -%</div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-center">
-                                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Correct Score</p>
-                                <p class="text-xl font-bold text-brand-gold" id="md_cs">-</p>
-                            </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-center flex flex-col justify-center">
-                                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">H2H Wins</p>
-                                <div class="text-xs font-bold text-navy-900">
-                                    H: <span id="md_h2h_h">0</span> - A: <span id="md_h2h_a">0</span>
+                    <!-- 2. Scoring & H2H (Grid Layout) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Scoring Metrics -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                            <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Scoring Averages</div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="font-bold text-brand-green" id="md_h_sc_avg">-</span>
+                                    <span class="text-[10px] text-gray-500 uppercase">Scored</span>
+                                    <span class="font-bold text-brand-green" id="md_a_sc_avg">-</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="font-bold text-red-500" id="md_h_con_avg">-</span>
+                                    <span class="text-[10px] text-gray-500 uppercase">Conceded</span>
+                                    <span class="font-bold text-red-500" id="md_a_con_avg">-</span>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- H2H History -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                            <div class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Head-to-Head</div>
+                            <div class="flex justify-between items-center px-2 mb-1">
+                                <div class="text-center">
+                                    <div class="text-lg font-black text-navy-900" id="md_h2h_h">0</div>
+                                    <div class="text-[9px] text-gray-400 uppercase">Wins</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-base font-bold text-gray-400" id="md_h2h_d">0</div>
+                                    <div class="text-[9px] text-gray-300 uppercase">Draws</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-lg font-black text-navy-900" id="md_h2h_a">0</div>
+                                    <div class="text-[9px] text-gray-400 uppercase">Wins</div>
+                                </div>
+                            </div>
+                            <!-- Mini Bar -->
+                            <div class="flex rounded-full overflow-hidden h-2 bg-gray-100 mx-1">
+                                <div id="bar_h2h_h" class="bg-brand-blue h-full" style="width: 33%"></div>
+                                <div id="bar_h2h_d" class="bg-gray-300 h-full" style="width: 33%"></div>
+                                <div id="bar_h2h_a" class="bg-navy-900 h-full" style="width: 34%"></div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Away Stats -->
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-r-4 border-navy-900 shadow-sm flex-row-reverse">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Power</span>
-                            <span class="font-bold text-xl text-navy-900" id="md_a_power">-</span>
+                    <!-- 3. Model Intelligence -->
+                    <div class="bg-gradient-to-br from-navy-900 to-brand-blue rounded-lg shadow-md p-4 text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 opacity-5 text-8xl transform translate-x-4 -translate-y-4"><i class="fa-solid fa-brain"></i></div>
+                        <div class="relative z-10 grid grid-cols-3 gap-4 text-center items-center">
+                            <div>
+                                <div class="text-[9px] text-blue-200 uppercase font-bold tracking-widest mb-0.5">Model Goals</div>
+                                <div class="text-xl font-black text-white" id="md_model_goals">-</div>
+                            </div>
+                            <div class="bg-white/10 rounded-lg p-2 border border-white/20">
+                                <div class="text-[9px] text-brand-gold uppercase font-bold tracking-widest mb-0.5">Prediction</div>
+                                <div class="text-2xl font-black text-white leading-none mb-1" id="md_prediction">-</div>
+                                <div class="text-[10px] font-bold text-blue-100" id="md_prob">Prob: -%</div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] text-blue-200 uppercase font-bold tracking-widest mb-0.5">Correct Score</div>
+                                <div class="text-xl font-black text-white" id="md_cs">-</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-r-4 border-gray-300 shadow-sm flex-row-reverse">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Form</span>
-                            <span class="font-bold text-xl text-navy-900" id="md_a_form">-</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-r-4 border-gray-300 shadow-sm flex-row-reverse">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Pos</span>
-                            <span class="font-bold text-xl text-navy-900" id="md_a_pos">-</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-white p-3 rounded-lg border-r-4 border-brand-green shadow-sm flex-row-reverse">
-                            <span class="text-xs font-bold text-gray-400 uppercase">Scored Avg</span>
-                            <span class="font-bold text-xl text-brand-green" id="md_a_sc_avg">-</span>
+                    </div>
+
+                    <!-- 4. Differentials (Compact Grid) -->
+                    <div>
+                         <div class="flex items-center justify-center mb-2">
+                             <div class="h-px bg-gray-200 flex-1"></div>
+                             <span class="px-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Key Differentials</span>
+                             <div class="h-px bg-gray-200 flex-1"></div>
+                         </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-gray-100 p-2 rounded text-center shadow-sm">
+                                <span class="block text-[9px] text-gray-400 font-bold uppercase">Power Diff</span>
+                                <span class="font-bold text-sm text-navy-900" id="md_diff_power">-</span>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded text-center shadow-sm">
+                                <span class="block text-[9px] text-gray-400 font-bold uppercase">Form Diff</span>
+                                <span class="font-bold text-sm text-navy-900" id="md_diff_form">-</span>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded text-center shadow-sm">
+                                <span class="block text-[9px] text-gray-400 font-bold uppercase">Pos Diff</span>
+                                <span class="font-bold text-sm text-navy-900" id="md_diff_pos">-</span>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded text-center shadow-sm">
+                                <span class="block text-[9px] text-gray-400 font-bold uppercase">Scored Diff</span>
+                                <span class="font-bold text-sm text-navy-900" id="md_diff_scored">-</span>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded text-center shadow-sm">
+                                <span class="block text-[9px] text-gray-400 font-bold uppercase">Conceded Diff</span>
+                                <span class="font-bold text-sm text-navy-900" id="md_diff_conceded">-</span>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded text-center shadow-sm">
+                                <span class="block text-[9px] text-gray-400 font-bold uppercase">H2H Diff</span>
+                                <span class="font-bold text-sm text-navy-900" id="md_diff_h2h">-</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Insights Section -->
-                <div class="bg-white rounded-xl border border-gray-200 p-5 mb-6">
-                    <h4 class="text-sm font-bold text-navy-900 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-scale-balanced text-brand-gold"></i> DIFFERENTIALS & INSIGHTS
-                    </h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="p-3 bg-gray-50 rounded-lg text-center">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold mb-1">Power Diff</div>
-                            <div class="font-bold text-lg text-navy-900" id="md_diff_power">-</div>
-                        </div>
-                        <div class="p-3 bg-gray-50 rounded-lg text-center">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold mb-1">Form Diff</div>
-                            <div class="font-bold text-lg text-navy-900" id="md_diff_form">-</div>
-                        </div>
-                        <div class="p-3 bg-gray-50 rounded-lg text-center">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold mb-1">Scored Diff</div>
-                            <div class="font-bold text-lg text-navy-900" id="md_diff_scored">-</div>
-                        </div>
-                        <div class="p-3 bg-gray-50 rounded-lg text-center">
-                            <div class="text-[10px] text-gray-400 uppercase font-bold mb-1">Conceded Diff</div>
-                            <div class="font-bold text-lg text-navy-900" id="md_diff_conceded">-</div>
-                        </div>
-                    </div>
-                </div>
-
-                <a href="#" id="md_link" target="_blank" class="block w-full text-center bg-navy-900 text-white py-4 rounded-xl font-bold hover:bg-brand-blue transition shadow-lg flex items-center justify-center gap-2">
-                    <span>View Match Source</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            <!-- Modal Footer: Buttons -->
+            <div class="p-4 bg-white border-t border-gray-100 shrink-0 flex gap-3">
+                 <a href="#" id="md_link" target="_blank" class="flex-1 text-center bg-white text-navy-900 border border-gray-300 py-2.5 rounded-lg text-sm font-bold hover:bg-gray-50 transition flex items-center justify-center gap-2 group">
+                    <span>Match Source</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs group-hover:translate-x-1 transition-transform"></i>
                 </a>
+                <button onclick="closeModal('matchDetailsModal')" class="flex-1 bg-navy-900 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-brand-blue transition shadow-md">
+                    Close Details
+                </button>
             </div>
         </div>
     </div>
@@ -696,15 +762,19 @@
             const viewDashboard = document.getElementById('viewDashboard');
             const viewAnalytics = document.getElementById('viewAnalytics');
 
+            // IMPORTANT: Re-run filters to ensure analytics gets correct dataset
+            // If tab is 'analytics', applyFilters will use 'all' logic (ignoring 'top' logic)
+            applyFilters();
+
             if (tab === 'analytics') {
                 viewDashboard.classList.add('hidden');
                 viewAnalytics.classList.remove('hidden');
-                updateCharts(); // Initialize/Update charts
+                updateCharts(); 
             } else {
                 viewDashboard.classList.remove('hidden');
                 viewAnalytics.classList.add('hidden');
                 currentPage = 1;
-                applyFilters();
+                renderTable();
             }
         }
 
@@ -720,7 +790,9 @@
             const af_h2h_h_max = parseFloat(document.getElementById('af_h2h_h_max').value) || Infinity;
             
             filteredData = allData.filter(row => {
-                // Tab Filter (Only applies to Table Views, Analytics uses All Data unless filtered by user controls)
+                // Tab Filter Logic:
+                // If we are in 'Top Matches', only show 'Perfect'.
+                // If we are in 'Analytics', ignore the tab filter (show All matches subject to search/dropdowns)
                 if (currentTab === 'top' && row['Quick Tip'] !== 'Perfect') return false;
 
                 if (searchTerm && !row['Home Team'].toLowerCase().includes(searchTerm) && !row['Away Team'].toLowerCase().includes(searchTerm)) return false;
@@ -737,20 +809,32 @@
                 return true;
             });
 
-            currentPage = 1;
+            // Update UI elements depending on view
             updateKPIs();
             if (currentTab !== 'analytics') {
-                renderTable();
+                // Don't render table if hidden, saving resources
+                // But we reset page if filters changed
             } else {
                 updateCharts();
+            }
+        }
+
+        function applyAdvancedFilters() { 
+            applyFilters(); 
+            if(currentTab !== 'analytics') {
+                currentPage = 1;
+                renderTable();
             }
             closeModal('advancedFiltersModal');
         }
 
-        function applyAdvancedFilters() { applyFilters(); }
         function clearAdvancedFilters() {
             document.querySelectorAll('#advancedFiltersModal input').forEach(inp => inp.value = '');
             applyFilters();
+            if(currentTab !== 'analytics') {
+                currentPage = 1;
+                renderTable();
+            }
         }
 
         // --- Rendering ---
@@ -798,74 +882,70 @@
                     const tr = document.createElement('tr');
                     tr.className = "match-row group";
                     
-                    // Alternating Row Colors: Odd -> Light Blue, Even -> Light Green
-                    // Note: index 0 is first row (Odd), index 1 is second (Even)
+                    // Subtle Alternating Row Colors (Very light blue/green)
                     if (index % 2 === 0) {
-                        tr.classList.add('bg-blue-50/40');
+                        tr.classList.add('bg-blue-50/30');
                     } else {
-                        tr.classList.add('bg-green-50/30');
+                        tr.classList.add('bg-green-50/20');
                     }
                     
                     const res = row['Match Result'] || '-';
                     const pred = row['Model Prediction'];
                     const isWin = isPredictionCorrect(res, pred);
                     const isUpcoming = (res === '-' || res === '?');
-                    const isHighGoals = checkHighGoals(res);
                     const conf = parseFloat(row['Confidence %']) || 0;
                     
-                    // Row Styling logic
+                    // Result Badge Logic
                     let predBadge = "";
-                    
                     if (!isUpcoming) {
                         if (isWin) {
-                            predBadge = `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold border border-green-200">WIN</span>`;
+                            predBadge = `<span class="inline-block w-2 h-2 bg-green-500 rounded-full ml-1" title="Win"></span>`;
                         } else {
-                            predBadge = `<span class="text-gray-400 text-xs">—</span>`;
+                            predBadge = `<span class="inline-block w-2 h-2 bg-red-300 rounded-full ml-1" title="Loss"></span>`;
                         }
                     } else {
-                        predBadge = `<span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold border border-orange-200">SOON</span>`;
+                        predBadge = `<span class="inline-block w-2 h-2 bg-orange-400 rounded-full ml-1" title="Upcoming"></span>`;
                     }
 
-                    // Model Goals Badge
+                    // Model Goals > 2.5 Badge
                     let goalsDisplay = `<span class="text-gray-500">${row['Model Goals']}</span>`;
                     if (parseFloat(row['Model Goals']) > 2.5) {
-                        goalsDisplay = `<span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded-full border border-green-200">>2.5</span>`;
+                        goalsDisplay = `<span class="bg-green-100 text-green-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-200">${row['Model Goals']}</span>`;
                     }
 
                     // Confidence Bar Logic
                     let barColorClass = "bg-brand-blue";
-                    let barShadowClass = "";
-                    
-                    if (conf > 50) {
-                        barColorClass = "bg-brand-green";
-                    }
-                    if (conf > 75) {
-                        barShadowClass = "shadow-[0_0_8px_rgba(34,197,94,0.6)]";
-                    }
+                    if (conf > 50) barColorClass = "bg-brand-green";
+                    if (conf > 75) barColorClass = "bg-[#10b981]"; 
 
                     tr.innerHTML = `
                         <td class="px-5 py-4 whitespace-nowrap text-navy-900 font-bold">${row['Date']}</td>
-                        <td class="px-5 py-4 whitespace-nowrap text-xs text-gray-400 font-medium truncate max-w-[120px]" title="${row['League']}">${row['League']}</td>
+                        <td class="px-5 py-4 text-center whitespace-nowrap">
+                            <button class="text-navy-900 hover:text-white hover:bg-brand-blue bg-white border border-gray-200 hover:border-brand-blue px-3 py-1.5 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1 mx-auto text-xs font-bold" onclick="viewMatch(${allData.indexOf(row)})">
+                                <span>View</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </td>
+                        <td class="px-5 py-4 whitespace-nowrap text-xs text-gray-500 font-medium truncate max-w-[120px]" title="${row['League']}">${row['League']}</td>
                         <td class="px-5 py-4 whitespace-nowrap">
                             <div class="flex flex-col">
-                                <span class="font-bold text-navy-900 text-base">${row['Home Team']}</span>
+                                <span class="font-bold text-navy-900 text-sm">${row['Home Team']}</span>
                                 <span class="text-xs text-gray-500 font-medium">${row['Away Team']}</span>
                             </div>
                         </td>
-                        <td class="px-5 py-4 text-center whitespace-nowrap text-xs text-gray-500 font-mono">
-                            ${row['Home Odds']}/${row['Draw Odds']}/${row['Away Odds']}
+                        <td class="px-5 py-4 text-center whitespace-nowrap text-xs text-gray-400 font-mono tracking-tighter">
+                            ${row['Home Odds']}|${row['Draw Odds']}|${row['Away Odds']}
                         </td>
                         <td class="px-5 py-4 text-center whitespace-nowrap">
                             <div class="flex items-center gap-2 justify-center">
-                                <div class="w-16 bg-gray-200/80 rounded-full h-2 overflow-hidden">
-                                    <div class="${barColorClass} h-full rounded-full transition-all duration-500 ${barShadowClass}" style="width: ${conf}%"></div>
+                                <div class="w-12 bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                    <div class="${barColorClass} h-full rounded-full" style="width: ${conf}%"></div>
                                 </div>
-                                <span class="text-xs font-bold text-navy-900 w-8 text-left">${conf}%</span>
+                                <span class="text-xs font-bold text-gray-600 w-6 text-left">${conf}</span>
                             </div>
                         </td>
-                        <td class="px-5 py-4 text-center whitespace-nowrap text-xs text-navy-900 font-bold">${row['Correct Score']}</td>
+                        <td class="px-5 py-4 text-center whitespace-nowrap text-xs text-navy-900 font-bold opacity-80">${row['Correct Score']}</td>
                         <td class="px-5 py-4 text-center whitespace-nowrap text-sm font-bold text-navy-900">
-                           <div class="flex flex-col items-center gap-1">
+                           <div class="flex items-center justify-center">
                                 <span>${pred}</span>
                                 ${predBadge}
                            </div>
@@ -874,12 +954,7 @@
                             ${goalsDisplay}
                         </td>
                         <td class="px-5 py-4 text-center whitespace-nowrap">
-                            <span class="font-mono font-bold text-navy-900 bg-white/80 px-2 py-1 rounded border border-gray-100 shadow-sm">${res}</span>
-                        </td>
-                        <td class="px-5 py-4 text-center whitespace-nowrap">
-                            <button class="text-navy-900 hover:text-brand-blue bg-white border border-gray-200 hover:border-brand-blue p-2 rounded-lg transition shadow-sm opacity-80 hover:opacity-100" onclick="viewMatch(${allData.indexOf(row)})">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
+                            <span class="font-mono font-bold text-navy-900 bg-white/50 px-2 py-1 rounded text-xs">${res}</span>
                         </td>
                     `;
                     tableBody.appendChild(tr);
@@ -1094,18 +1169,12 @@
             return false;
         }
 
-        function checkHighGoals(result) {
-            if (!result || result === '-' || result === '?') return false;
-            const parts = result.split('-');
-            if (parts.length !== 2) return false;
-            return (parseInt(parts[0]) + parseInt(parts[1])) > 2.5;
-        }
-
         // --- Modals ---
         function viewMatch(index) {
             const d = allData[index];
             if (!d) return;
 
+            // Header
             document.getElementById('md_league').innerText = d['League'];
             document.getElementById('md_date').innerText = d['Date'];
             document.getElementById('md_home').innerText = d['Home Team'];
@@ -1114,42 +1183,68 @@
             const res = d['Match Result'];
             if(res && res !== '-' && res !== '?') {
                  document.getElementById('md_score').innerText = res;
-                 document.getElementById('md_score').classList.remove('text-brand-blue');
-                 document.getElementById('md_score').classList.add('text-white');
             } else {
                 document.getElementById('md_score').innerText = 'VS';
-                document.getElementById('md_score').classList.add('text-brand-blue');
             }
 
-            document.getElementById('md_h_power').innerText = d['Home Power'];
+            // Team & Form
             document.getElementById('md_h_form').innerText = d['Home Form'];
             document.getElementById('md_h_pos').innerText = d['Home Position'];
-            document.getElementById('md_h_sc_avg').innerText = d['Home Scored Avg'];
-
-            document.getElementById('md_a_power').innerText = d['Away Power'];
+            document.getElementById('md_h_power').innerText = d['Home Power'];
+            
             document.getElementById('md_a_form').innerText = d['Away Form'];
             document.getElementById('md_a_pos').innerText = d['Away Position'];
-            document.getElementById('md_a_sc_avg').innerText = d['Away Scored Avg'];
+            document.getElementById('md_a_power').innerText = d['Away Power'];
 
+            // Scoring Metrics
+            document.getElementById('md_h_sc_avg').innerText = d['Home Scored Avg'];
+            document.getElementById('md_h_con_avg').innerText = d['Home Conceded Avg'];
+            document.getElementById('md_a_sc_avg').innerText = d['Away Scored Avg'];
+            document.getElementById('md_a_con_avg').innerText = d['Away Conceded Avg'];
+
+            // H2H Bars & Numbers
+            const hWin = parseInt(d['H2H Home Wins']) || 0;
+            const aWin = parseInt(d['H2H Away Wins']) || 0;
+            // Try to find Draw or use 0
+            const draw = d['H2H Draws'] ? parseInt(d['H2H Draws']) : 0; 
+            
+            document.getElementById('md_h2h_h').innerText = hWin;
+            document.getElementById('md_h2h_d').innerText = draw;
+            document.getElementById('md_h2h_a').innerText = aWin;
+
+            // Simple bar width calc
+            const totalH2H = hWin + aWin + draw + 0.1; // avoid div by 0
+            document.getElementById('bar_h2h_h').style.width = `${(hWin/totalH2H)*100}%`;
+            document.getElementById('bar_h2h_d').style.width = `${(draw/totalH2H)*100}%`;
+            document.getElementById('bar_h2h_a').style.width = `${(aWin/totalH2H)*100}%`;
+            
+            // Model Centerpiece
+            document.getElementById('md_model_goals').innerText = d['Model Goals'];
             document.getElementById('md_prediction').innerText = d['Model Prediction'];
             document.getElementById('md_prob').innerText = `Prob: ${d['Model Probability %']}%`;
             document.getElementById('md_cs').innerText = d['Correct Score'];
-            document.getElementById('md_h2h_h').innerText = d['H2H Home Wins'];
-            document.getElementById('md_h2h_a').innerText = d['H2H Away Wins'];
 
+            // Differentials with Color Coding
             const setDiff = (id, val) => {
                 const el = document.getElementById(id);
                 el.innerText = val;
                 const n = parseFloat(val);
-                if(n > 0) { el.className = "font-bold text-lg text-brand-green"; el.innerHTML += ' <i class="fa-solid fa-arrow-up text-xs ml-1"></i>'; }
-                else if(n < 0) { el.className = "font-bold text-lg text-brand-orange"; el.innerHTML += ' <i class="fa-solid fa-arrow-down text-xs ml-1"></i>'; }
-                else el.className = "font-bold text-lg text-gray-500";
+                if(n > 0) { el.className = "font-bold text-sm text-brand-green"; el.innerHTML += ' <i class="fa-solid fa-caret-up text-[10px] ml-1"></i>'; }
+                else if(n < 0) { el.className = "font-bold text-sm text-red-500"; el.innerHTML += ' <i class="fa-solid fa-caret-down text-[10px] ml-1"></i>'; }
+                else el.className = "font-bold text-sm text-gray-400";
             }
 
             setDiff('md_diff_power', d['Power Difference']);
             setDiff('md_diff_form', d['Form Difference']);
             setDiff('md_diff_scored', d['Scored Difference']);
             setDiff('md_diff_conceded', d['Conceded Difference']);
+            
+            // Calc explicit diffs for others if missing in CSV columns
+            const posDiff = (parseFloat(d['Home Position']) - parseFloat(d['Away Position'])).toFixed(0);
+            setDiff('md_diff_pos', posDiff); 
+            
+            const h2hDiff = (hWin - aWin).toFixed(0);
+            setDiff('md_diff_h2h', h2hDiff);
 
             document.getElementById('md_link').href = d['Match URL'] || '#';
 
