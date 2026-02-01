@@ -151,6 +151,14 @@
             z-index: 5;
             position: relative;
         }
+
+        /* Correct Prediction Highlight */
+        .match-row.correct-prediction {
+            background-color: #dcfce7 !important; /* Tailwind green-100 */
+        }
+        .match-row.correct-prediction:hover {
+             background-color: #bbf7d0 !important; /* Darker green on hover */
+        }
         
         /* Comparison Modal Stat Bar */
         .stat-bar-bg {
@@ -262,6 +270,7 @@
 
         <!-- Shared Filter Section -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+            <!-- Header Row: Title, Search, Export -->
             <div class="flex flex-col lg:flex-row gap-5 justify-between items-end lg:items-center mb-5 border-b border-gray-100 pb-5">
                 <div class="flex items-center gap-3">
                     <div class="bg-navy-900 p-1.5 rounded text-white"><i class="fa-solid fa-filter text-xs"></i></div>
@@ -278,15 +287,17 @@
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- Filters Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-4">
+                <!-- Row 1 of Filters -->
                 <div class="relative">
                     <select id="filterDate" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
                         <option value="">All Dates</option>
                     </select>
                 </div>
                 <div class="relative">
-                    <select id="filterCorrectScore" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
-                        <option value="">Correct Score</option>
+                    <select id="filterLeague" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
+                        <option value="">All Leagues</option>
                     </select>
                 </div>
                 <div class="relative">
@@ -294,15 +305,61 @@
                         <option value="">Prediction</option>
                     </select>
                 </div>
-                
-                <div class="flex gap-2 items-center">
+                <div class="relative">
+                    <select id="filterCorrectScore" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
+                        <option value="">Correct Score</option>
+                    </select>
+                </div>
+                 <div class="flex gap-2 items-center">
                     <input type="number" id="filterConfMin" placeholder="Conf % Min" class="w-1/2 px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
                     <input type="number" id="filterConfMax" placeholder="Max" class="w-1/2 px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
                 </div>
+            </div>
 
-                <button onclick="openModal('advancedFiltersModal')" class="w-full px-4 py-2.5 bg-brand-blue text-white font-medium rounded-lg hover:bg-blue-600 transition text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
-                    <i class="fa-solid fa-sliders"></i> More Filters
-                </button>
+            <!-- Row 2 of Filters (New Ranges) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-4">
+                 <!-- Model Goals -->
+                 <div class="flex flex-col gap-1">
+                    <label class="text-[10px] uppercase font-bold text-gray-400">Model Goals</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="filterGoalsMin" placeholder="Min" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                        <input type="number" id="filterGoalsMax" placeholder="Max" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                    </div>
+                 </div>
+                 <!-- Home Odds -->
+                 <div class="flex flex-col gap-1">
+                    <label class="text-[10px] uppercase font-bold text-gray-400">Home Odds</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="filterHomeOddsMin" placeholder="Min" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                        <input type="number" id="filterHomeOddsMax" placeholder="Max" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                    </div>
+                 </div>
+                 <!-- Draw Odds -->
+                 <div class="flex flex-col gap-1">
+                    <label class="text-[10px] uppercase font-bold text-gray-400">Draw Odds</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="filterDrawOddsMin" placeholder="Min" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                        <input type="number" id="filterDrawOddsMax" placeholder="Max" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                    </div>
+                 </div>
+                 <!-- Away Odds -->
+                 <div class="flex flex-col gap-1">
+                    <label class="text-[10px] uppercase font-bold text-gray-400">Away Odds</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="filterAwayOddsMin" placeholder="Min" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                        <input type="number" id="filterAwayOddsMax" placeholder="Max" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:ring-brand-blue">
+                    </div>
+                 </div>
+
+                 <!-- Action Buttons -->
+                 <div class="flex flex-col gap-2 justify-end h-full">
+                    <button onclick="applyFilters()" class="w-full px-4 py-2 bg-brand-green text-white font-medium rounded-lg hover:bg-green-600 transition text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+                        <i class="fa-solid fa-check"></i> Apply Filters
+                    </button>
+                    <button onclick="openModal('advancedFiltersModal')" class="w-full px-4 py-2 bg-brand-blue text-white font-medium rounded-lg hover:bg-blue-600 transition text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+                        <i class="fa-solid fa-sliders"></i> More Filters
+                    </button>
+                 </div>
             </div>
         </div>
 
@@ -442,6 +499,12 @@
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">H2H Away Wins</label><div class="flex gap-2"><input type="number" id="af_h2h_a_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_h2h_a_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Home Power</label><div class="flex gap-2"><input type="number" id="af_hp_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_hp_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Away Power</label><div class="flex gap-2"><input type="number" id="af_ap_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_ap_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
+                
+                <!-- NEW FILTERS IN MODAL -->
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Power Difference</label><div class="flex gap-2"><input type="number" id="af_power_diff_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_power_diff_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Position Difference</label><div class="flex gap-2"><input type="number" id="af_pos_diff_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_pos_diff_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
+                <!-- END NEW -->
+
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Form Diff</label><div class="flex gap-2"><input type="number" id="af_fd_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_fd_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Model Prob %</label><div class="flex gap-2"><input type="number" id="af_mp_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_mp_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Scored Diff</label><div class="flex gap-2"><input type="number" id="af_sd_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_sd_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
@@ -454,7 +517,7 @@
         </div>
     </div>
 
-    <!-- Match Details Modal (New Compact & Complete Design) -->
+    <!-- Match Details Modal -->
     <div id="matchDetailsModal" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <!-- Max-width reduced from 5xl to 3xl for compactness -->
         <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-auto overflow-hidden transform transition-all border border-gray-600 max-h-[95vh] flex flex-col">
@@ -671,6 +734,7 @@
                 
                 // Populate Filter Dropdowns
                 populateDropdown('filterDate', 'Date');
+                populateDropdown('filterLeague', 'League'); // New
                 populateDropdown('filterCorrectScore', 'Correct Score');
                 populateDropdown('filterPrediction', 'Model Prediction');
 
@@ -731,16 +795,25 @@
         // --- Filtering Logic ---
         function setupEventListeners() {
             let debounceTimer;
+            // Search input triggers applyFilters automatically with debounce
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => applyFilters(), 300);
             });
 
-            ['filterDate', 'filterCorrectScore', 'filterPrediction', 'filterConfMin', 'filterConfMax'].forEach(id => {
+            // Dropdowns trigger automatically
+            ['filterDate', 'filterLeague', 'filterCorrectScore', 'filterPrediction'].forEach(id => {
                 document.getElementById(id).addEventListener('change', () => applyFilters());
-                if(id.includes('Min') || id.includes('Max')) {
-                    document.getElementById(id).addEventListener('input', () => applyFilters());
-                }
+            });
+
+            // Note: Range inputs (Min/Max) do not trigger auto-update to prevent jitter/lag. 
+            // They rely on the "Apply Filters" button as requested, or the user can hit Enter.
+            // We can add "Enter" key support for inputs
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter') applyFilters();
+                });
             });
         }
 
@@ -763,7 +836,6 @@
             const viewAnalytics = document.getElementById('viewAnalytics');
 
             // IMPORTANT: Re-run filters to ensure analytics gets correct dataset
-            // If tab is 'analytics', applyFilters will use 'all' logic (ignoring 'top' logic)
             applyFilters();
 
             if (tab === 'analytics') {
@@ -779,41 +851,124 @@
         }
 
         function applyFilters() {
+            // Main Filters
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const fDate = document.getElementById('filterDate').value;
+            const fLeague = document.getElementById('filterLeague').value;
             const fCS = document.getElementById('filterCorrectScore').value;
             const fPred = document.getElementById('filterPrediction').value;
+            
             const fConfMin = parseFloat(document.getElementById('filterConfMin').value) || 0;
             const fConfMax = parseFloat(document.getElementById('filterConfMax').value) || 100;
 
+            // New Range Filters
+            const fGoalsMin = parseFloat(document.getElementById('filterGoalsMin').value) || -Infinity;
+            const fGoalsMax = parseFloat(document.getElementById('filterGoalsMax').value) || Infinity;
+            
+            const fHomeOddsMin = parseFloat(document.getElementById('filterHomeOddsMin').value) || -Infinity;
+            const fHomeOddsMax = parseFloat(document.getElementById('filterHomeOddsMax').value) || Infinity;
+            
+            const fDrawOddsMin = parseFloat(document.getElementById('filterDrawOddsMin').value) || -Infinity;
+            const fDrawOddsMax = parseFloat(document.getElementById('filterDrawOddsMax').value) || Infinity;
+            
+            const fAwayOddsMin = parseFloat(document.getElementById('filterAwayOddsMin').value) || -Infinity;
+            const fAwayOddsMax = parseFloat(document.getElementById('filterAwayOddsMax').value) || Infinity;
+
+            // Advanced Filters
             const af_h2h_h_min = parseFloat(document.getElementById('af_h2h_h_min').value) || -Infinity;
             const af_h2h_h_max = parseFloat(document.getElementById('af_h2h_h_max').value) || Infinity;
+            const af_h2h_a_min = parseFloat(document.getElementById('af_h2h_a_min').value) || -Infinity;
+            const af_h2h_a_max = parseFloat(document.getElementById('af_h2h_a_max').value) || Infinity;
+            const af_hp_min = parseFloat(document.getElementById('af_hp_min').value) || -Infinity;
+            const af_hp_max = parseFloat(document.getElementById('af_hp_max').value) || Infinity;
+            const af_ap_min = parseFloat(document.getElementById('af_ap_min').value) || -Infinity;
+            const af_ap_max = parseFloat(document.getElementById('af_ap_max').value) || Infinity;
+            const af_fd_min = parseFloat(document.getElementById('af_fd_min').value) || -Infinity;
+            const af_fd_max = parseFloat(document.getElementById('af_fd_max').value) || Infinity;
+            const af_mp_min = parseFloat(document.getElementById('af_mp_min').value) || -Infinity;
+            const af_mp_max = parseFloat(document.getElementById('af_mp_max').value) || Infinity;
+            const af_sd_min = parseFloat(document.getElementById('af_sd_min').value) || -Infinity;
+            const af_sd_max = parseFloat(document.getElementById('af_sd_max').value) || Infinity;
+            const af_cd_min = parseFloat(document.getElementById('af_cd_min').value) || -Infinity;
+            const af_cd_max = parseFloat(document.getElementById('af_cd_max').value) || Infinity;
+            
+            // New Advanced Filters
+            const af_power_diff_min = parseFloat(document.getElementById('af_power_diff_min').value) || -Infinity;
+            const af_power_diff_max = parseFloat(document.getElementById('af_power_diff_max').value) || Infinity;
+            const af_pos_diff_min = parseFloat(document.getElementById('af_pos_diff_min').value) || -Infinity;
+            const af_pos_diff_max = parseFloat(document.getElementById('af_pos_diff_max').value) || Infinity;
+
             
             filteredData = allData.filter(row => {
-                // Tab Filter Logic:
-                // If we are in 'Top Matches', only show 'Perfect'.
-                // If we are in 'Analytics', ignore the tab filter (show All matches subject to search/dropdowns)
+                // Tab Filter Logic
                 if (currentTab === 'top' && row['Quick Tip'] !== 'Perfect') return false;
 
+                // Search
                 if (searchTerm && !row['Home Team'].toLowerCase().includes(searchTerm) && !row['Away Team'].toLowerCase().includes(searchTerm)) return false;
+                
+                // Dropdowns
                 if (fDate && row['Date'] !== fDate) return false;
+                if (fLeague && row['League'] !== fLeague) return false;
                 if (fCS && row['Correct Score'] !== fCS) return false;
                 if (fPred && row['Model Prediction'] !== fPred) return false;
 
+                // Ranges
                 const conf = parseFloat(row['Confidence %']) || 0;
                 if (conf < fConfMin || conf > fConfMax) return false;
 
+                const goals = parseFloat(row['Model Goals']) || 0;
+                if (goals < fGoalsMin || goals > fGoalsMax) return false;
+
+                const homeOdds = parseFloat(row['Home Odds']) || 0;
+                if (homeOdds < fHomeOddsMin || homeOdds > fHomeOddsMax) return false;
+
+                const drawOdds = parseFloat(row['Draw Odds']) || 0;
+                if (drawOdds < fDrawOddsMin || drawOdds > fDrawOddsMax) return false;
+
+                const awayOdds = parseFloat(row['Away Odds']) || 0;
+                if (awayOdds < fAwayOddsMin || awayOdds > fAwayOddsMax) return false;
+
+                // Advanced
                 const h2hH = parseFloat(row['H2H Home Wins']) || 0;
                 if (h2hH < af_h2h_h_min || h2hH > af_h2h_h_max) return false;
+                
+                const h2hA = parseFloat(row['H2H Away Wins']) || 0;
+                if (h2hA < af_h2h_a_min || h2hA > af_h2h_a_max) return false;
+                
+                const hp = parseFloat(row['Home Power']) || 0;
+                if (hp < af_hp_min || hp > af_hp_max) return false;
+                
+                const ap = parseFloat(row['Away Power']) || 0;
+                if (ap < af_ap_min || ap > af_ap_max) return false;
+
+                const fd = parseFloat(row['Form Difference']) || 0;
+                if (fd < af_fd_min || fd > af_fd_max) return false;
+                
+                const mp = parseFloat(row['Model Probability %']) || 0;
+                if (mp < af_mp_min || mp > af_mp_max) return false;
+                
+                const sd = parseFloat(row['Scored Difference']) || 0;
+                if (sd < af_sd_min || sd > af_sd_max) return false;
+                
+                const cd = parseFloat(row['Conceded Difference']) || 0;
+                if (cd < af_cd_min || cd > af_cd_max) return false;
+
+                // New Advanced Logic
+                const powerDiff = parseFloat(row['Power Difference']) || 0;
+                if (powerDiff < af_power_diff_min || powerDiff > af_power_diff_max) return false;
+
+                const posDiff = (parseFloat(row['Home Position']) - parseFloat(row['Away Position']));
+                if (posDiff < af_pos_diff_min || posDiff > af_pos_diff_max) return false;
+
 
                 return true;
             });
 
-            // Update UI elements depending on view
+            // Update UI
             updateKPIs();
             if (currentTab !== 'analytics') {
-                // Don't render table if hidden, saving resources
-                // But we reset page if filters changed
+                currentPage = 1; // Reset to page 1 on filter change
+                renderTable();
             } else {
                 updateCharts();
             }
@@ -822,7 +977,6 @@
         function applyAdvancedFilters() { 
             applyFilters(); 
             if(currentTab !== 'analytics') {
-                currentPage = 1;
                 renderTable();
             }
             closeModal('advancedFiltersModal');
@@ -831,10 +985,6 @@
         function clearAdvancedFilters() {
             document.querySelectorAll('#advancedFiltersModal input').forEach(inp => inp.value = '');
             applyFilters();
-            if(currentTab !== 'analytics') {
-                currentPage = 1;
-                renderTable();
-            }
         }
 
         // --- Rendering ---
@@ -882,18 +1032,23 @@
                     const tr = document.createElement('tr');
                     tr.className = "match-row group";
                     
-                    // Subtle Alternating Row Colors (Very light blue/green)
-                    if (index % 2 === 0) {
-                        tr.classList.add('bg-blue-50/30');
-                    } else {
-                        tr.classList.add('bg-green-50/20');
-                    }
-                    
                     const res = row['Match Result'] || '-';
                     const pred = row['Model Prediction'];
                     const isWin = isPredictionCorrect(res, pred);
                     const isUpcoming = (res === '-' || res === '?');
                     const conf = parseFloat(row['Confidence %']) || 0;
+                    
+                    // Row Background Logic
+                    if (isWin && !isUpcoming) {
+                        tr.classList.add('correct-prediction');
+                    } else {
+                         // Subtle Alternating Row Colors if not correct
+                        if (index % 2 === 0) {
+                            tr.classList.add('bg-blue-50/30');
+                        } else {
+                            tr.classList.add('bg-green-50/20');
+                        }
+                    }
                     
                     // Result Badge Logic
                     let predBadge = "";
