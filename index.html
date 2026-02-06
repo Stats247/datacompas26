@@ -88,11 +88,22 @@
         /* Table sticky header */
         .table-container {
             overflow-x: auto;
+            max-height: 70vh; /* Allow vertical scroll for footer */
         }
         thead th {
             position: sticky;
             top: 0;
             z-index: 10;
+        }
+        
+        /* Sticky Footer */
+        tfoot tr {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            background-color: #f8fafc;
+            border-top: 2px solid #e2e8f0;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         /* Card Hover Effects */
@@ -233,48 +244,70 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         <!-- KPI Cards Section (Visible on Dashboard tabs) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="analyticsCards">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4" id="analyticsCards">
             <!-- Total Matches -->
-            <div class="kpi-card bg-white p-5 rounded-xl shadow-sm border-l-4 border-brand-blue flex items-center justify-between relative overflow-hidden">
+            <div class="kpi-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-brand-blue flex flex-col justify-between relative overflow-hidden h-28">
                 <div class="relative z-10">
-                    <p class="text-xs text-gray-400 uppercase font-semibold tracking-wider mb-1">Total Matches</p>
-                    <p class="text-3xl font-bold text-navy-900" id="statTotal">-</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider mb-1">Total Matches</p>
+                    <p class="text-2xl font-bold text-navy-900" id="statTotal">-</p>
                 </div>
-                <div class="text-brand-blue opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
+                <div class="text-brand-blue opacity-10 text-4xl absolute right-2 bottom-2">
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
             </div>
 
             <!-- Total Wins -->
-            <div class="kpi-card bg-white p-5 rounded-xl shadow-sm border-l-4 border-brand-green flex items-center justify-between relative overflow-hidden">
+            <div class="kpi-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-brand-green flex flex-col justify-between relative overflow-hidden h-28">
                 <div class="relative z-10">
-                    <p class="text-xs text-gray-400 uppercase font-semibold tracking-wider mb-1">Total Wins</p>
-                    <p class="text-3xl font-bold text-navy-900" id="statWins">-</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider mb-1">Total Wins</p>
+                    <p class="text-2xl font-bold text-navy-900" id="statWins">-</p>
                 </div>
-                <div class="text-brand-green opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
+                <div class="text-brand-green opacity-10 text-4xl absolute right-2 bottom-2">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
             </div>
 
             <!-- Win Rate -->
-            <div class="kpi-card bg-white p-5 rounded-xl shadow-sm border-l-4 border-indigo-500 flex items-center justify-between relative overflow-hidden">
+            <div class="kpi-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500 flex flex-col justify-between relative overflow-hidden h-28">
                 <div class="relative z-10">
-                    <p class="text-xs text-gray-400 uppercase font-semibold tracking-wider mb-1">Win Rate</p>
-                    <p class="text-3xl font-bold text-navy-900" id="statRate">-</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider mb-1">Win Rate</p>
+                    <p class="text-2xl font-bold text-navy-900" id="statRate">-</p>
                 </div>
-                <div class="text-indigo-500 opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
+                <div class="text-indigo-500 opacity-10 text-4xl absolute right-2 bottom-2">
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
             </div>
 
             <!-- Upcoming -->
-            <div class="kpi-card bg-white p-5 rounded-xl shadow-sm border-l-4 border-brand-orange flex items-center justify-between relative overflow-hidden">
+            <div class="kpi-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-brand-orange flex flex-col justify-between relative overflow-hidden h-28">
                 <div class="relative z-10">
-                    <p class="text-xs text-gray-400 uppercase font-semibold tracking-wider mb-1">Upcoming</p>
-                    <p class="text-3xl font-bold text-navy-900" id="statUpcoming">-</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider mb-1">Upcoming</p>
+                    <p class="text-2xl font-bold text-navy-900" id="statUpcoming">-</p>
                 </div>
-                <div class="text-brand-orange opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
+                <div class="text-brand-orange opacity-10 text-4xl absolute right-2 bottom-2">
                     <i class="fa-regular fa-clock"></i>
+                </div>
+            </div>
+
+            <!-- Net Revenue (New) -->
+            <div class="kpi-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-emerald-500 flex flex-col justify-between relative overflow-hidden h-28">
+                <div class="relative z-10">
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider mb-1">Net Revenue</p>
+                    <p class="text-2xl font-bold text-emerald-600" id="statRevenue">-</p>
+                </div>
+                <div class="text-emerald-500 opacity-10 text-4xl absolute right-2 bottom-2">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                </div>
+            </div>
+
+            <!-- Total Odds (New) -->
+            <div class="kpi-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 flex flex-col justify-between relative overflow-hidden h-28">
+                <div class="relative z-10">
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider mb-1">Total Odds</p>
+                    <p class="text-2xl font-bold text-purple-600 truncate" id="statTotalOdds">-</p>
+                </div>
+                <div class="text-purple-500 opacity-10 text-4xl absolute right-2 bottom-2">
+                    <i class="fa-solid fa-calculator"></i>
                 </div>
             </div>
         </div>
@@ -413,12 +446,21 @@
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">CS</th>
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Pred</th>
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Goals</th>
+                                <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Revenue</th> <!-- New Column -->
                                 <th class="px-5 py-5 text-center text-xs font-bold uppercase tracking-wider whitespace-nowrap">Result</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white text-sm" id="tableBody">
                             <!-- Rows rendered via JS -->
                         </tbody>
+                        <!-- Table Footer -->
+                        <tfoot class="bg-gray-50 font-bold text-navy-900">
+                            <tr>
+                                <td colspan="9" class="px-5 py-4 text-right uppercase text-xs tracking-wider">Total Revenue (Page):</td>
+                                <td class="px-5 py-4 text-center" id="footerRevenue">-</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 
@@ -1227,8 +1269,6 @@
             
             // Switch tab and render
             switchTab('matches_control');
-            // Show toast or alert?
-            // alert("Settings saved locally! Simulating Google Sheet save...");
         }
 
         function loadControlSettings() {
@@ -1262,31 +1302,65 @@
             setVal('ctrl_cd_min', c.ctrl_cd_min); setVal('ctrl_cd_max', c.ctrl_cd_max);
         }
 
+        // --- Helper: Get Odds for Predicted Result ---
+        function getOddsForPrediction(row) {
+            const pred = row['Model Prediction'] ? row['Model Prediction'].toLowerCase() : '';
+            if (pred === '1' || pred === 'home') return parseFloat(row['Home Odds']) || 1.0;
+            if (pred === 'x' || pred === 'draw') return parseFloat(row['Draw Odds']) || 1.0;
+            if (pred === '2' || pred === 'away') return parseFloat(row['Away Odds']) || 1.0;
+            return 1.0;
+        }
+
         // --- Rendering ---
         function updateKPIs() {
             const total = filteredData.length;
             let wins = 0;
             let upcoming = 0;
+            let totalRevenue = 0;
+            let totalOdds = 1.0;
+            let hasFilteredMatches = total > 0;
 
             filteredData.forEach(row => {
                 const res = row['Match Result'];
                 const pred = row['Model Prediction'];
+                const odds = getOddsForPrediction(row);
                 
+                // Accumulate Odds
+                totalOdds *= odds;
+
                 if (!res || res === '-' || res === '?') {
                     upcoming++;
                 } else if (isPredictionCorrect(res, pred)) {
                     wins++;
+                    // Revenue: (Odds * 100) - 100
+                    totalRevenue += (odds * 100) - 100;
+                } else {
+                    // Loss: -100
+                    totalRevenue += -100;
                 }
             });
 
             const rate = total > 0 && (total - upcoming) > 0 
                 ? ((wins / (total - upcoming)) * 100).toFixed(1) + '%' 
                 : '0%';
+            
+            // Format Total Odds: if massive, use scientific or truncated
+            let formattedTotalOdds = totalOdds.toFixed(2);
+            if (totalOdds > 10000) formattedTotalOdds = totalOdds.toExponential(2);
+            if (!hasFilteredMatches) formattedTotalOdds = "0.00";
 
             document.getElementById('statTotal').innerText = total;
             document.getElementById('statWins').innerText = wins;
             document.getElementById('statRate').innerText = rate;
             document.getElementById('statUpcoming').innerText = upcoming;
+            
+            // Revenue Display
+            const revEl = document.getElementById('statRevenue');
+            revEl.innerText = (totalRevenue >= 0 ? '+' : '') + totalRevenue.toFixed(2);
+            revEl.className = `text-2xl font-bold ${totalRevenue >= 0 ? 'text-emerald-600' : 'text-red-500'}`;
+
+            // Total Odds Display
+            document.getElementById('statTotalOdds').innerText = formattedTotalOdds;
         }
 
         function renderTable() {
@@ -1296,6 +1370,9 @@
 
             tableBody.innerHTML = '';
             
+            // Calc Page Revenue for Footer
+            let pageRevenue = 0;
+
             if (pageData.length === 0) {
                 emptyState.classList.remove('hidden');
                 document.getElementById('matchesTable').classList.add('hidden');
@@ -1346,6 +1423,34 @@
                     let barColorClass = "bg-brand-blue";
                     if (conf > 50) barColorClass = "bg-brand-green";
                     if (conf > 75) barColorClass = "bg-[#10b981]"; 
+                    
+                    // Revenue Calculation Logic
+                    const odds = getOddsForPrediction(row);
+                    let revenue = 0;
+                    let revenueText = "-";
+                    let revenueClass = "text-gray-400"; // default gray
+                    
+                    if (isUpcoming) {
+                        // Show Potential Return (Stake * Odds)
+                        revenue = odds * 100;
+                        revenueText = revenue.toFixed(2);
+                        revenueClass = "text-gray-400 font-medium"; // Gray for potential
+                    } else {
+                        if (isWin) {
+                            // Profit: (Odds * 100) - 100
+                            revenue = (odds * 100) - 100;
+                            revenueText = "+" + revenue.toFixed(2);
+                            revenueClass = "text-emerald-600 font-bold";
+                            pageRevenue += revenue;
+                        } else {
+                            // Loss: -100
+                            revenue = -100;
+                            revenueText = "-100.00";
+                            revenueClass = "text-red-500 font-bold";
+                            pageRevenue += revenue;
+                        }
+                    }
+
 
                     tr.innerHTML = `
                         <td class="px-5 py-4 whitespace-nowrap text-navy-900 font-bold">${row['Date']}</td>
@@ -1382,6 +1487,9 @@
                         <td class="px-5 py-4 text-center whitespace-nowrap text-xs">
                             ${goalsDisplay}
                         </td>
+                         <td class="px-5 py-4 text-center whitespace-nowrap text-sm ${revenueClass}">
+                            ${revenueText}
+                        </td>
                         <td class="px-5 py-4 text-center whitespace-nowrap">
                             <span class="font-mono font-bold text-navy-900 bg-white/50 px-2 py-1 rounded text-xs">${res}</span>
                         </td>
@@ -1389,6 +1497,11 @@
                     tableBody.appendChild(tr);
                 });
             }
+            
+            // Update Footer Revenue
+            const footerEl = document.getElementById('footerRevenue');
+            footerEl.innerText = (pageRevenue >= 0 ? '+' : '') + pageRevenue.toFixed(2);
+            footerEl.className = `px-5 py-4 text-center font-bold text-lg ${pageRevenue >= 0 ? 'text-emerald-600' : 'text-red-500'}`;
 
             document.getElementById('pgStart').innerText = filteredData.length > 0 ? start + 1 : 0;
             document.getElementById('pgEnd').innerText = Math.min(end, filteredData.length);
