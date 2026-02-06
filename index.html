@@ -109,6 +109,7 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         
         /* Active Tab Gradient & Glow */
@@ -171,6 +172,22 @@
             height: 100%;
             border-radius: 3px;
         }
+        
+        /* Input focus rings for Control Tab */
+        .control-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .control-input:focus {
+            ring: 2px;
+            border-color: #1E6FFF;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 111, 255, 0.1);
+        }
     </style>
 </head>
 <body class="text-slate-800 font-sans antialiased min-h-screen flex flex-col">
@@ -191,15 +208,21 @@
                 </div>
 
                 <!-- Navigation Tabs (Pill Container) -->
-                <div class="flex space-x-1 bg-navy-900/60 shadow-inner p-1.5 rounded-full backdrop-blur-md border border-white/10">
-                    <button id="tabAll" class="nav-tab active px-6 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2" onclick="switchTab('all')">
-                        <i class="fa-solid fa-layer-group text-blue-100 opacity-90"></i> All Matches
+                <div class="flex space-x-1 bg-navy-900/60 shadow-inner p-1.5 rounded-full backdrop-blur-md border border-white/10 overflow-x-auto max-w-[60vw]">
+                    <button id="tabAll" class="nav-tab active px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('all')">
+                        <i class="fa-solid fa-layer-group opacity-90"></i> All Matches
                     </button>
-                    <button id="tabTop" class="nav-tab inactive text-gray-400 px-6 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2" onclick="switchTab('top')">
+                    <button id="tabTop" class="nav-tab inactive text-gray-400 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('top')">
                         <i class="fa-solid fa-star text-brand-gold"></i> Top Matches
                     </button>
-                    <button id="tabAnalytics" class="nav-tab inactive text-gray-400 px-6 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2" onclick="switchTab('analytics')">
-                        <i class="fa-solid fa-chart-pie text-brand-green opacity-80"></i> Analytics
+                     <button id="tabMatchesControl" class="nav-tab inactive text-gray-400 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('matches_control')">
+                        <i class="fa-solid fa-filter-circle-dollar text-orange-400"></i> Matches Control
+                    </button>
+                    <button id="tabAnalytics" class="nav-tab inactive text-gray-400 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('analytics')">
+                        <i class="fa-solid fa-chart-pie opacity-80"></i> Analytics
+                    </button>
+                    <button id="tabControl" class="nav-tab inactive text-gray-400 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('control_panel')">
+                        <i class="fa-solid fa-sliders text-cyan-400"></i> Control
                     </button>
                 </div>
             </div>
@@ -209,7 +232,7 @@
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <!-- KPI Cards Section (Visible on all tabs) -->
+        <!-- KPI Cards Section (Visible on Dashboard tabs) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="analyticsCards">
             <!-- Total Matches -->
             <div class="kpi-card bg-white p-5 rounded-xl shadow-sm border-l-4 border-brand-blue flex items-center justify-between relative overflow-hidden">
@@ -219,9 +242,6 @@
                 </div>
                 <div class="text-brand-blue opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
                     <i class="fa-solid fa-layer-group"></i>
-                </div>
-                <div class="p-3 bg-blue-50 rounded-full text-brand-blue shadow-sm z-10">
-                    <i class="fa-solid fa-list text-lg"></i>
                 </div>
             </div>
 
@@ -234,9 +254,6 @@
                 <div class="text-brand-green opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
-                <div class="p-3 bg-green-50 rounded-full text-brand-green shadow-sm z-10">
-                    <i class="fa-solid fa-check text-lg"></i>
-                </div>
             </div>
 
             <!-- Win Rate -->
@@ -247,9 +264,6 @@
                 </div>
                 <div class="text-indigo-500 opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
                     <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <div class="p-3 bg-indigo-50 rounded-full text-indigo-500 shadow-sm z-10">
-                    <i class="fa-solid fa-percent text-lg"></i>
                 </div>
             </div>
 
@@ -262,14 +276,11 @@
                 <div class="text-brand-orange opacity-10 text-5xl absolute right-2 bottom-0 transform translate-y-2">
                     <i class="fa-regular fa-clock"></i>
                 </div>
-                <div class="p-3 bg-orange-50 rounded-full text-brand-orange shadow-sm z-10">
-                    <i class="fa-solid fa-stopwatch text-lg"></i>
-                </div>
             </div>
         </div>
 
-        <!-- Shared Filter Section -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+        <!-- Shared Filter Section (Hidden on Control Panels) -->
+        <div id="mainFiltersSection" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
             <!-- Header Row: Title, Search, Export -->
             <div class="flex flex-col lg:flex-row gap-5 justify-between items-end lg:items-center mb-5 border-b border-gray-100 pb-5">
                 <div class="flex items-center gap-3">
@@ -300,6 +311,18 @@
                         <option value="">All Leagues</option>
                     </select>
                 </div>
+                <!-- NEW FILTERS: HOME/AWAY FORM -->
+                <div class="relative">
+                    <select id="filterHomeForm" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
+                        <option value="">Home Form</option>
+                    </select>
+                </div>
+                 <div class="relative">
+                    <select id="filterAwayForm" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
+                        <option value="">Away Form</option>
+                    </select>
+                </div>
+
                 <div class="relative">
                     <select id="filterPrediction" class="form-select w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue bg-gray-50 text-navy-900 font-medium">
                         <option value="">Prediction</option>
@@ -365,6 +388,16 @@
 
         <!-- VIEW: DASHBOARD TABLE -->
         <div id="viewDashboard" class="transition-opacity duration-300">
+            <div id="controlHeader" class="hidden mb-4 bg-orange-50 border border-orange-200 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-navy-900"><i class="fa-solid fa-filter-circle-dollar text-orange-500 mr-2"></i>Matches Control View</h3>
+                    <p class="text-sm text-gray-600">Showing matches based on criteria set in the <strong>Control Panel</strong>.</p>
+                </div>
+                <button onclick="switchTab('control_panel')" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-50">
+                    Edit Criteria
+                </button>
+            </div>
+
             <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden flex flex-col" id="tableExportWrapper">
                 <div class="table-container overflow-x-auto">
                     <table class="min-w-full" id="matchesTable">
@@ -482,19 +515,70 @@
             </div>
         </div>
 
+        <!-- VIEW: CONTROL PANEL -->
+        <div id="viewControlPanel" class="hidden animate-fade-in">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-navy-900"><i class="fa-solid fa-sliders text-cyan-500 mr-2"></i>Control Panel</h2>
+                        <p class="text-sm text-gray-500">Configure global criteria for the "Matches Control" view. These settings simulate the Google Sheet control tab.</p>
+                    </div>
+                    <button onclick="saveControlSettings()" class="bg-brand-blue text-white px-6 py-2.5 rounded-lg shadow-lg hover:bg-blue-600 transition font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Save & Apply Criteria
+                    </button>
+                </div>
+
+                <!-- Control Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6">
+                    
+                    <!-- Section: Key Metrics -->
+                    <div class="col-span-full border-b border-gray-100 pb-2 mb-2"><h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Key Metrics</h3></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Confidence %</label><div class="flex gap-2"><input type="number" id="ctrl_conf_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_conf_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Model Goals</label><div class="flex gap-2"><input type="number" id="ctrl_goals_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_goals_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Model Prob %</label><div class="flex gap-2"><input type="number" id="ctrl_prob_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_prob_max" placeholder="Max" class="control-input"></div></div>
+                    
+                    <!-- Section: Odds -->
+                    <div class="col-span-full border-b border-gray-100 pb-2 mb-2 mt-2"><h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Odds Constraints</h3></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Home Odds</label><div class="flex gap-2"><input type="number" id="ctrl_home_odds_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_home_odds_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Draw Odds</label><div class="flex gap-2"><input type="number" id="ctrl_draw_odds_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_draw_odds_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Away Odds</label><div class="flex gap-2"><input type="number" id="ctrl_away_odds_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_away_odds_max" placeholder="Max" class="control-input"></div></div>
+
+                    <!-- Section: Team Stats -->
+                    <div class="col-span-full border-b border-gray-100 pb-2 mb-2 mt-2"><h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Team Stats & Differentials</h3></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">H2H Home Wins</label><div class="flex gap-2"><input type="number" id="ctrl_h2h_h_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_h2h_h_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">H2H Away Wins</label><div class="flex gap-2"><input type="number" id="ctrl_h2h_a_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_h2h_a_max" placeholder="Max" class="control-input"></div></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Home Power</label><div class="flex gap-2"><input type="number" id="ctrl_hp_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_hp_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Away Power</label><div class="flex gap-2"><input type="number" id="ctrl_ap_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_ap_max" placeholder="Max" class="control-input"></div></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Power Difference</label><div class="flex gap-2"><input type="number" id="ctrl_power_diff_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_power_diff_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Position Difference</label><div class="flex gap-2"><input type="number" id="ctrl_pos_diff_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_pos_diff_max" placeholder="Max" class="control-input"></div></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Form Difference</label><div class="flex gap-2"><input type="number" id="ctrl_fd_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_fd_max" placeholder="Max" class="control-input"></div></div>
+                    
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Scored Diff</label><div class="flex gap-2"><input type="number" id="ctrl_sd_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_sd_max" placeholder="Max" class="control-input"></div></div>
+                    <div><label class="block text-xs font-bold text-navy-900 mb-1">Conceded Diff</label><div class="flex gap-2"><input type="number" id="ctrl_cd_min" placeholder="Min" class="control-input"><input type="number" id="ctrl_cd_max" placeholder="Max" class="control-input"></div></div>
+
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Advanced Filters Modal -->
     <div id="advancedFiltersModal" class="fixed inset-0 bg-navy-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-auto my-8 border border-gray-200">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-auto my-8 border border-gray-200 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl shrink-0">
                 <div>
                     <h3 class="text-lg font-bold text-navy-900">Advanced Filters</h3>
                     <p class="text-xs text-gray-500">Refine your search with granular metrics</p>
                 </div>
                 <button onclick="closeModal('advancedFiltersModal')" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 max-h-[60vh] overflow-y-auto">
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 overflow-y-auto">
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">H2H Home Wins</label><div class="flex gap-2"><input type="number" id="af_h2h_h_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_h2h_h_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">H2H Away Wins</label><div class="flex gap-2"><input type="number" id="af_h2h_a_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_h2h_a_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Home Power</label><div class="flex gap-2"><input type="number" id="af_hp_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_hp_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
@@ -510,7 +594,7 @@
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Scored Diff</label><div class="flex gap-2"><input type="number" id="af_sd_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_sd_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
                 <div><label class="block text-xs font-bold text-gray-500 uppercase mb-1">Conceded Diff</label><div class="flex gap-2"><input type="number" id="af_cd_min" placeholder="Min" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"><input type="number" id="af_cd_max" placeholder="Max" class="w-full border border-gray-200 p-2 rounded text-sm focus:ring-brand-blue"></div></div>
             </div>
-            <div class="p-6 bg-gray-50 rounded-b-xl flex justify-end gap-3 border-t border-gray-100">
+            <div class="p-6 bg-gray-50 rounded-b-xl flex justify-end gap-3 border-t border-gray-100 shrink-0">
                 <button onclick="clearAdvancedFilters()" class="px-5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-100 font-medium transition">Reset</button>
                 <button onclick="applyAdvancedFilters()" class="px-5 py-2.5 bg-brand-blue text-white rounded-lg text-sm font-medium hover:bg-blue-600 shadow-md hover:shadow-lg transition">Apply Filters</button>
             </div>
@@ -706,8 +790,11 @@
         let filteredData = [];
         let currentPage = 1;
         const rowsPerPage = 30;
-        let currentTab = 'all'; // 'all', 'top', 'analytics'
+        let currentTab = 'all'; // 'all', 'top', 'matches_control', 'analytics', 'control_panel'
         
+        // Control Tab Settings Object
+        let controlConfig = JSON.parse(localStorage.getItem('match_analytics_control_config')) || {};
+
         // Chart Instances
         let charts = {};
 
@@ -720,6 +807,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
             setupEventListeners();
+            loadControlSettings(); // Load saved control settings into inputs
         });
 
         // --- Data Fetching & Parsing ---
@@ -734,7 +822,9 @@
                 
                 // Populate Filter Dropdowns
                 populateDropdown('filterDate', 'Date');
-                populateDropdown('filterLeague', 'League'); // New
+                populateDropdown('filterLeague', 'League'); 
+                populateDropdown('filterHomeForm', 'Home Form'); // New
+                populateDropdown('filterAwayForm', 'Away Form'); // New
                 populateDropdown('filterCorrectScore', 'Correct Score');
                 populateDropdown('filterPrediction', 'Model Prediction');
 
@@ -783,33 +873,49 @@
             }
 
             const headers = rows[0];
-            return rows.slice(1).map(r => {
+            const rawData = rows.slice(1).map(r => {
                 const obj = {};
                 headers.forEach((h, index) => {
                     obj[h] = r[index] || '';
                 });
                 return obj;
             });
+
+            // Remove duplicates based on MatchKey
+            const uniqueData = [];
+            const seenKeys = new Set();
+            
+            rawData.forEach(item => {
+                const key = item['MatchKey'];
+                // Only process if we have a key, if duplicate skip
+                if (key && !seenKeys.has(key)) {
+                    seenKeys.add(key);
+                    uniqueData.push(item);
+                } else if (!key) {
+                    // If no MatchKey, keep it (fallback)
+                    uniqueData.push(item);
+                }
+            });
+
+            return uniqueData;
         }
 
         // --- Filtering Logic ---
         function setupEventListeners() {
             let debounceTimer;
-            // Search input triggers applyFilters automatically with debounce
+            // Search input
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => applyFilters(), 300);
             });
 
-            // Dropdowns trigger automatically
-            ['filterDate', 'filterLeague', 'filterCorrectScore', 'filterPrediction'].forEach(id => {
+            // Dropdowns
+            ['filterDate', 'filterLeague', 'filterHomeForm', 'filterAwayForm', 'filterCorrectScore', 'filterPrediction'].forEach(id => {
                 document.getElementById(id).addEventListener('change', () => applyFilters());
             });
 
-            // Note: Range inputs (Min/Max) do not trigger auto-update to prevent jitter/lag. 
-            // They rely on the "Apply Filters" button as requested, or the user can hit Enter.
-            // We can add "Enter" key support for inputs
-            const inputs = document.querySelectorAll('input[type="number"]');
+            // Range inputs - Enter key triggers
+            const inputs = document.querySelectorAll('#mainFiltersSection input[type="number"]');
             inputs.forEach(input => {
                 input.addEventListener('keydown', (e) => {
                     if(e.key === 'Enter') applyFilters();
@@ -827,164 +933,333 @@
             });
 
             // Activate current tab button
-            const activeBtn = document.getElementById(tab === 'all' ? 'tabAll' : tab === 'top' ? 'tabTop' : 'tabAnalytics');
-            activeBtn.classList.remove('inactive', 'text-gray-400');
-            activeBtn.classList.add('active', 'text-white');
+            let activeBtnId;
+            if (tab === 'all') activeBtnId = 'tabAll';
+            else if (tab === 'top') activeBtnId = 'tabTop';
+            else if (tab === 'matches_control') activeBtnId = 'tabMatchesControl';
+            else if (tab === 'analytics') activeBtnId = 'tabAnalytics';
+            else if (tab === 'control_panel') activeBtnId = 'tabControl';
+            
+            const activeBtn = document.getElementById(activeBtnId);
+            if(activeBtn) {
+                activeBtn.classList.remove('inactive', 'text-gray-400');
+                activeBtn.classList.add('active', 'text-white');
+            }
 
             // View Switching
             const viewDashboard = document.getElementById('viewDashboard');
             const viewAnalytics = document.getElementById('viewAnalytics');
+            const viewControlPanel = document.getElementById('viewControlPanel');
+            const mainFilters = document.getElementById('mainFiltersSection');
+            const controlHeader = document.getElementById('controlHeader');
 
-            // IMPORTANT: Re-run filters to ensure analytics gets correct dataset
-            applyFilters();
+            // Hide all first
+            viewDashboard.classList.add('hidden');
+            viewAnalytics.classList.add('hidden');
+            viewControlPanel.classList.add('hidden');
+            mainFilters.classList.remove('hidden'); // Default show
+            controlHeader.classList.add('hidden');
 
             if (tab === 'analytics') {
-                viewDashboard.classList.add('hidden');
                 viewAnalytics.classList.remove('hidden');
-                updateCharts(); 
-            } else {
+                applyFilters(); // Re-run to update charts
+            } else if (tab === 'control_panel') {
+                viewControlPanel.classList.remove('hidden');
+                mainFilters.classList.add('hidden'); // Hide main filters here
+            } else if (tab === 'matches_control') {
                 viewDashboard.classList.remove('hidden');
-                viewAnalytics.classList.add('hidden');
-                currentPage = 1;
-                renderTable();
+                mainFilters.classList.add('hidden'); // Hide main filters here
+                controlHeader.classList.remove('hidden');
+                applyFilters(); // Will use controlConfig
+            } else {
+                // All or Top
+                viewDashboard.classList.remove('hidden');
+                applyFilters();
             }
         }
 
         function applyFilters() {
-            // Main Filters
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const fDate = document.getElementById('filterDate').value;
-            const fLeague = document.getElementById('filterLeague').value;
-            const fCS = document.getElementById('filterCorrectScore').value;
-            const fPred = document.getElementById('filterPrediction').value;
+            // Determine source of criteria
+            let criteria = {};
             
-            const fConfMin = parseFloat(document.getElementById('filterConfMin').value) || 0;
-            const fConfMax = parseFloat(document.getElementById('filterConfMax').value) || 100;
-
-            // New Range Filters
-            const fGoalsMin = parseFloat(document.getElementById('filterGoalsMin').value) || -Infinity;
-            const fGoalsMax = parseFloat(document.getElementById('filterGoalsMax').value) || Infinity;
-            
-            const fHomeOddsMin = parseFloat(document.getElementById('filterHomeOddsMin').value) || -Infinity;
-            const fHomeOddsMax = parseFloat(document.getElementById('filterHomeOddsMax').value) || Infinity;
-            
-            const fDrawOddsMin = parseFloat(document.getElementById('filterDrawOddsMin').value) || -Infinity;
-            const fDrawOddsMax = parseFloat(document.getElementById('filterDrawOddsMax').value) || Infinity;
-            
-            const fAwayOddsMin = parseFloat(document.getElementById('filterAwayOddsMin').value) || -Infinity;
-            const fAwayOddsMax = parseFloat(document.getElementById('filterAwayOddsMax').value) || Infinity;
-
-            // Advanced Filters
-            const af_h2h_h_min = parseFloat(document.getElementById('af_h2h_h_min').value) || -Infinity;
-            const af_h2h_h_max = parseFloat(document.getElementById('af_h2h_h_max').value) || Infinity;
-            const af_h2h_a_min = parseFloat(document.getElementById('af_h2h_a_min').value) || -Infinity;
-            const af_h2h_a_max = parseFloat(document.getElementById('af_h2h_a_max').value) || Infinity;
-            const af_hp_min = parseFloat(document.getElementById('af_hp_min').value) || -Infinity;
-            const af_hp_max = parseFloat(document.getElementById('af_hp_max').value) || Infinity;
-            const af_ap_min = parseFloat(document.getElementById('af_ap_min').value) || -Infinity;
-            const af_ap_max = parseFloat(document.getElementById('af_ap_max').value) || Infinity;
-            const af_fd_min = parseFloat(document.getElementById('af_fd_min').value) || -Infinity;
-            const af_fd_max = parseFloat(document.getElementById('af_fd_max').value) || Infinity;
-            const af_mp_min = parseFloat(document.getElementById('af_mp_min').value) || -Infinity;
-            const af_mp_max = parseFloat(document.getElementById('af_mp_max').value) || Infinity;
-            const af_sd_min = parseFloat(document.getElementById('af_sd_min').value) || -Infinity;
-            const af_sd_max = parseFloat(document.getElementById('af_sd_max').value) || Infinity;
-            const af_cd_min = parseFloat(document.getElementById('af_cd_min').value) || -Infinity;
-            const af_cd_max = parseFloat(document.getElementById('af_cd_max').value) || Infinity;
-            
-            // New Advanced Filters
-            const af_power_diff_min = parseFloat(document.getElementById('af_power_diff_min').value) || -Infinity;
-            const af_power_diff_max = parseFloat(document.getElementById('af_power_diff_max').value) || Infinity;
-            const af_pos_diff_min = parseFloat(document.getElementById('af_pos_diff_min').value) || -Infinity;
-            const af_pos_diff_max = parseFloat(document.getElementById('af_pos_diff_max').value) || Infinity;
-
+            if (currentTab === 'matches_control') {
+                // Use stored Control Panel settings
+                criteria = { ...controlConfig, isControlView: true };
+            } else {
+                // Use Standard UI Filters
+                criteria = {
+                    searchTerm: document.getElementById('searchInput').value.toLowerCase(),
+                    fDate: document.getElementById('filterDate').value,
+                    fLeague: document.getElementById('filterLeague').value,
+                    fHomeForm: document.getElementById('filterHomeForm').value,
+                    fAwayForm: document.getElementById('filterAwayForm').value,
+                    fCS: document.getElementById('filterCorrectScore').value,
+                    fPred: document.getElementById('filterPrediction').value,
+                    fConfMin: parseFloat(document.getElementById('filterConfMin').value) || 0,
+                    fConfMax: parseFloat(document.getElementById('filterConfMax').value) || 100,
+                    fGoalsMin: parseFloat(document.getElementById('filterGoalsMin').value) || -Infinity,
+                    fGoalsMax: parseFloat(document.getElementById('filterGoalsMax').value) || Infinity,
+                    fHomeOddsMin: parseFloat(document.getElementById('filterHomeOddsMin').value) || -Infinity,
+                    fHomeOddsMax: parseFloat(document.getElementById('filterHomeOddsMax').value) || Infinity,
+                    fDrawOddsMin: parseFloat(document.getElementById('filterDrawOddsMin').value) || -Infinity,
+                    fDrawOddsMax: parseFloat(document.getElementById('filterDrawOddsMax').value) || Infinity,
+                    fAwayOddsMin: parseFloat(document.getElementById('filterAwayOddsMin').value) || -Infinity,
+                    fAwayOddsMax: parseFloat(document.getElementById('filterAwayOddsMax').value) || Infinity,
+                    // Advanced modal vars
+                    af_h2h_h_min: parseFloat(document.getElementById('af_h2h_h_min').value) || -Infinity,
+                    af_h2h_h_max: parseFloat(document.getElementById('af_h2h_h_max').value) || Infinity,
+                    af_h2h_a_min: parseFloat(document.getElementById('af_h2h_a_min').value) || -Infinity,
+                    af_h2h_a_max: parseFloat(document.getElementById('af_h2h_a_max').value) || Infinity,
+                    af_hp_min: parseFloat(document.getElementById('af_hp_min').value) || -Infinity,
+                    af_hp_max: parseFloat(document.getElementById('af_hp_max').value) || Infinity,
+                    af_ap_min: parseFloat(document.getElementById('af_ap_min').value) || -Infinity,
+                    af_ap_max: parseFloat(document.getElementById('af_ap_max').value) || Infinity,
+                    af_fd_min: parseFloat(document.getElementById('af_fd_min').value) || -Infinity,
+                    af_fd_max: parseFloat(document.getElementById('af_fd_max').value) || Infinity,
+                    af_mp_min: parseFloat(document.getElementById('af_mp_min').value) || -Infinity,
+                    af_mp_max: parseFloat(document.getElementById('af_mp_max').value) || Infinity,
+                    af_sd_min: parseFloat(document.getElementById('af_sd_min').value) || -Infinity,
+                    af_sd_max: parseFloat(document.getElementById('af_sd_max').value) || Infinity,
+                    af_cd_min: parseFloat(document.getElementById('af_cd_min').value) || -Infinity,
+                    af_cd_max: parseFloat(document.getElementById('af_cd_max').value) || Infinity,
+                    // New Advanced
+                    af_power_diff_min: parseFloat(document.getElementById('af_power_diff_min').value) || -Infinity,
+                    af_power_diff_max: parseFloat(document.getElementById('af_power_diff_max').value) || Infinity,
+                    af_pos_diff_min: parseFloat(document.getElementById('af_pos_diff_min').value) || -Infinity,
+                    af_pos_diff_max: parseFloat(document.getElementById('af_pos_diff_max').value) || Infinity
+                };
+            }
             
             filteredData = allData.filter(row => {
-                // Tab Filter Logic
+                // 1. Tab Specific First
                 if (currentTab === 'top' && row['Quick Tip'] !== 'Perfect') return false;
 
-                // Search
-                if (searchTerm && !row['Home Team'].toLowerCase().includes(searchTerm) && !row['Away Team'].toLowerCase().includes(searchTerm)) return false;
-                
-                // Dropdowns
-                if (fDate && row['Date'] !== fDate) return false;
-                if (fLeague && row['League'] !== fLeague) return false;
-                if (fCS && row['Correct Score'] !== fCS) return false;
-                if (fPred && row['Model Prediction'] !== fPred) return false;
+                // 2. Logic Branch based on Mode
+                if (criteria.isControlView) {
+                    // CONTROL VIEW FILTERING
+                    const c = criteria;
+                    
+                    // Confidence
+                    const conf = parseFloat(row['Confidence %']) || 0;
+                    if (conf < (c.ctrl_conf_min || 0) || conf > (c.ctrl_conf_max || 100)) return false;
+                    
+                    // Goals
+                    const goals = parseFloat(row['Model Goals']) || 0;
+                    if (goals < (c.ctrl_goals_min || -Infinity) || goals > (c.ctrl_goals_max || Infinity)) return false;
+                    
+                    // Prob
+                    const prob = parseFloat(row['Model Probability %']) || 0;
+                    if (prob < (c.ctrl_prob_min || -Infinity) || prob > (c.ctrl_prob_max || Infinity)) return false;
+                    
+                    // Odds
+                    const hOdds = parseFloat(row['Home Odds']) || 0;
+                    if (hOdds < (c.ctrl_home_odds_min || -Infinity) || hOdds > (c.ctrl_home_odds_max || Infinity)) return false;
+                    const dOdds = parseFloat(row['Draw Odds']) || 0;
+                    if (dOdds < (c.ctrl_draw_odds_min || -Infinity) || dOdds > (c.ctrl_draw_odds_max || Infinity)) return false;
+                    const aOdds = parseFloat(row['Away Odds']) || 0;
+                    if (aOdds < (c.ctrl_away_odds_min || -Infinity) || aOdds > (c.ctrl_away_odds_max || Infinity)) return false;
 
-                // Ranges
-                const conf = parseFloat(row['Confidence %']) || 0;
-                if (conf < fConfMin || conf > fConfMax) return false;
+                    // H2H
+                    const h2hH = parseFloat(row['H2H Home Wins']) || 0;
+                    if (h2hH < (c.ctrl_h2h_h_min || -Infinity) || h2hH > (c.ctrl_h2h_h_max || Infinity)) return false;
+                    const h2hA = parseFloat(row['H2H Away Wins']) || 0;
+                    if (h2hA < (c.ctrl_h2h_a_min || -Infinity) || h2hA > (c.ctrl_h2h_a_max || Infinity)) return false;
+                    
+                    // Power
+                    const hp = parseFloat(row['Home Power']) || 0;
+                    if (hp < (c.ctrl_hp_min || -Infinity) || hp > (c.ctrl_hp_max || Infinity)) return false;
+                    const ap = parseFloat(row['Away Power']) || 0;
+                    if (ap < (c.ctrl_ap_min || -Infinity) || ap > (c.ctrl_ap_max || Infinity)) return false;
+                    
+                    // Diffs
+                    const pDiff = parseFloat(row['Power Difference']) || 0;
+                    if (pDiff < (c.ctrl_power_diff_min || -Infinity) || pDiff > (c.ctrl_power_diff_max || Infinity)) return false;
+                    
+                    const posDiff = (parseFloat(row['Home Position']) - parseFloat(row['Away Position']));
+                    if (posDiff < (c.ctrl_pos_diff_min || -Infinity) || posDiff > (c.ctrl_pos_diff_max || Infinity)) return false;
 
-                const goals = parseFloat(row['Model Goals']) || 0;
-                if (goals < fGoalsMin || goals > fGoalsMax) return false;
+                    const fd = parseFloat(row['Form Difference']) || 0;
+                    if (fd < (c.ctrl_fd_min || -Infinity) || fd > (c.ctrl_fd_max || Infinity)) return false;
+                    
+                    const sd = parseFloat(row['Scored Difference']) || 0;
+                    if (sd < (c.ctrl_sd_min || -Infinity) || sd > (c.ctrl_sd_max || Infinity)) return false;
+                    
+                    const cd = parseFloat(row['Conceded Difference']) || 0;
+                    if (cd < (c.ctrl_cd_min || -Infinity) || cd > (c.ctrl_cd_max || Infinity)) return false;
 
-                const homeOdds = parseFloat(row['Home Odds']) || 0;
-                if (homeOdds < fHomeOddsMin || homeOdds > fHomeOddsMax) return false;
+                    return true;
 
-                const drawOdds = parseFloat(row['Draw Odds']) || 0;
-                if (drawOdds < fDrawOddsMin || drawOdds > fDrawOddsMax) return false;
+                } else {
+                    // STANDARD VIEW FILTERING
+                    const c = criteria;
 
-                const awayOdds = parseFloat(row['Away Odds']) || 0;
-                if (awayOdds < fAwayOddsMin || awayOdds > fAwayOddsMax) return false;
+                    // Search
+                    if (c.searchTerm && !row['Home Team'].toLowerCase().includes(c.searchTerm) && !row['Away Team'].toLowerCase().includes(c.searchTerm)) return false;
+                    
+                    // Dropdowns
+                    if (c.fDate && row['Date'] !== c.fDate) return false;
+                    if (c.fLeague && row['League'] !== c.fLeague) return false;
+                    if (c.fHomeForm && row['Home Form'] !== c.fHomeForm) return false; // New
+                    if (c.fAwayForm && row['Away Form'] !== c.fAwayForm) return false; // New
+                    if (c.fCS && row['Correct Score'] !== c.fCS) return false;
+                    if (c.fPred && row['Model Prediction'] !== c.fPred) return false;
 
-                // Advanced
-                const h2hH = parseFloat(row['H2H Home Wins']) || 0;
-                if (h2hH < af_h2h_h_min || h2hH > af_h2h_h_max) return false;
-                
-                const h2hA = parseFloat(row['H2H Away Wins']) || 0;
-                if (h2hA < af_h2h_a_min || h2hA > af_h2h_a_max) return false;
-                
-                const hp = parseFloat(row['Home Power']) || 0;
-                if (hp < af_hp_min || hp > af_hp_max) return false;
-                
-                const ap = parseFloat(row['Away Power']) || 0;
-                if (ap < af_ap_min || ap > af_ap_max) return false;
+                    // Ranges (Main)
+                    const conf = parseFloat(row['Confidence %']) || 0;
+                    if (conf < c.fConfMin || conf > c.fConfMax) return false;
 
-                const fd = parseFloat(row['Form Difference']) || 0;
-                if (fd < af_fd_min || fd > af_fd_max) return false;
-                
-                const mp = parseFloat(row['Model Probability %']) || 0;
-                if (mp < af_mp_min || mp > af_mp_max) return false;
-                
-                const sd = parseFloat(row['Scored Difference']) || 0;
-                if (sd < af_sd_min || sd > af_sd_max) return false;
-                
-                const cd = parseFloat(row['Conceded Difference']) || 0;
-                if (cd < af_cd_min || cd > af_cd_max) return false;
+                    const goals = parseFloat(row['Model Goals']) || 0;
+                    if (goals < c.fGoalsMin || goals > c.fGoalsMax) return false;
 
-                // New Advanced Logic
-                const powerDiff = parseFloat(row['Power Difference']) || 0;
-                if (powerDiff < af_power_diff_min || powerDiff > af_power_diff_max) return false;
+                    const homeOdds = parseFloat(row['Home Odds']) || 0;
+                    if (homeOdds < c.fHomeOddsMin || homeOdds > c.fHomeOddsMax) return false;
 
-                const posDiff = (parseFloat(row['Home Position']) - parseFloat(row['Away Position']));
-                if (posDiff < af_pos_diff_min || posDiff > af_pos_diff_max) return false;
+                    const drawOdds = parseFloat(row['Draw Odds']) || 0;
+                    if (drawOdds < c.fDrawOddsMin || drawOdds > c.fDrawOddsMax) return false;
 
+                    const awayOdds = parseFloat(row['Away Odds']) || 0;
+                    if (awayOdds < c.fAwayOddsMin || awayOdds > c.fAwayOddsMax) return false;
 
-                return true;
+                    // Ranges (Advanced)
+                    const h2hH = parseFloat(row['H2H Home Wins']) || 0;
+                    if (h2hH < c.af_h2h_h_min || h2hH > c.af_h2h_h_max) return false;
+                    
+                    const h2hA = parseFloat(row['H2H Away Wins']) || 0;
+                    if (h2hA < c.af_h2h_a_min || h2hA > c.af_h2h_a_max) return false;
+                    
+                    const hp = parseFloat(row['Home Power']) || 0;
+                    if (hp < c.af_hp_min || hp > c.af_hp_max) return false;
+                    
+                    const ap = parseFloat(row['Away Power']) || 0;
+                    if (ap < c.af_ap_min || ap > c.af_ap_max) return false;
+
+                    const fd = parseFloat(row['Form Difference']) || 0;
+                    if (fd < c.af_fd_min || fd > c.af_fd_max) return false;
+                    
+                    const mp = parseFloat(row['Model Probability %']) || 0;
+                    if (mp < c.af_mp_min || mp > c.af_mp_max) return false;
+                    
+                    const sd = parseFloat(row['Scored Difference']) || 0;
+                    if (sd < c.af_sd_min || sd > c.af_sd_max) return false;
+                    
+                    const cd = parseFloat(row['Conceded Difference']) || 0;
+                    if (cd < c.af_cd_min || cd > c.af_cd_max) return false;
+
+                    const powerDiff = parseFloat(row['Power Difference']) || 0;
+                    if (powerDiff < c.af_power_diff_min || powerDiff > c.af_power_diff_max) return false;
+
+                    const posDiff = (parseFloat(row['Home Position']) - parseFloat(row['Away Position']));
+                    if (posDiff < c.af_pos_diff_min || posDiff > c.af_pos_diff_max) return false;
+
+                    return true;
+                }
             });
 
             // Update UI
             updateKPIs();
-            if (currentTab !== 'analytics') {
-                currentPage = 1; // Reset to page 1 on filter change
-                renderTable();
-            } else {
+            if (currentTab === 'analytics') {
                 updateCharts();
+            } else if (currentTab === 'control_panel') {
+                // Do nothing to table
+            } else {
+                currentPage = 1; 
+                renderTable();
             }
         }
 
+        // --- Advanced Filters Functionality ---
         function applyAdvancedFilters() { 
+            // Re-trigger applyFilters to read the modal inputs
             applyFilters(); 
-            if(currentTab !== 'analytics') {
-                renderTable();
-            }
+            // If we are on dashboard or top tabs, the table will re-render in applyFilters()
             closeModal('advancedFiltersModal');
         }
 
         function clearAdvancedFilters() {
             document.querySelectorAll('#advancedFiltersModal input').forEach(inp => inp.value = '');
             applyFilters();
+        }
+
+        // --- Control Panel Functions ---
+        function saveControlSettings() {
+            // Read inputs
+            controlConfig = {
+                ctrl_conf_min: parseFloat(document.getElementById('ctrl_conf_min').value) || -Infinity,
+                ctrl_conf_max: parseFloat(document.getElementById('ctrl_conf_max').value) || Infinity,
+                ctrl_goals_min: parseFloat(document.getElementById('ctrl_goals_min').value) || -Infinity,
+                ctrl_goals_max: parseFloat(document.getElementById('ctrl_goals_max').value) || Infinity,
+                ctrl_prob_min: parseFloat(document.getElementById('ctrl_prob_min').value) || -Infinity,
+                ctrl_prob_max: parseFloat(document.getElementById('ctrl_prob_max').value) || Infinity,
+                
+                ctrl_home_odds_min: parseFloat(document.getElementById('ctrl_home_odds_min').value) || -Infinity,
+                ctrl_home_odds_max: parseFloat(document.getElementById('ctrl_home_odds_max').value) || Infinity,
+                ctrl_draw_odds_min: parseFloat(document.getElementById('ctrl_draw_odds_min').value) || -Infinity,
+                ctrl_draw_odds_max: parseFloat(document.getElementById('ctrl_draw_odds_max').value) || Infinity,
+                ctrl_away_odds_min: parseFloat(document.getElementById('ctrl_away_odds_min').value) || -Infinity,
+                ctrl_away_odds_max: parseFloat(document.getElementById('ctrl_away_odds_max').value) || Infinity,
+
+                ctrl_h2h_h_min: parseFloat(document.getElementById('ctrl_h2h_h_min').value) || -Infinity,
+                ctrl_h2h_h_max: parseFloat(document.getElementById('ctrl_h2h_h_max').value) || Infinity,
+                ctrl_h2h_a_min: parseFloat(document.getElementById('ctrl_h2h_a_min').value) || -Infinity,
+                ctrl_h2h_a_max: parseFloat(document.getElementById('ctrl_h2h_a_max').value) || Infinity,
+
+                ctrl_hp_min: parseFloat(document.getElementById('ctrl_hp_min').value) || -Infinity,
+                ctrl_hp_max: parseFloat(document.getElementById('ctrl_hp_max').value) || Infinity,
+                ctrl_ap_min: parseFloat(document.getElementById('ctrl_ap_min').value) || -Infinity,
+                ctrl_ap_max: parseFloat(document.getElementById('ctrl_ap_max').value) || Infinity,
+
+                ctrl_power_diff_min: parseFloat(document.getElementById('ctrl_power_diff_min').value) || -Infinity,
+                ctrl_power_diff_max: parseFloat(document.getElementById('ctrl_power_diff_max').value) || Infinity,
+                ctrl_pos_diff_min: parseFloat(document.getElementById('ctrl_pos_diff_min').value) || -Infinity,
+                ctrl_pos_diff_max: parseFloat(document.getElementById('ctrl_pos_diff_max').value) || Infinity,
+
+                ctrl_fd_min: parseFloat(document.getElementById('ctrl_fd_min').value) || -Infinity,
+                ctrl_fd_max: parseFloat(document.getElementById('ctrl_fd_max').value) || Infinity,
+                
+                ctrl_sd_min: parseFloat(document.getElementById('ctrl_sd_min').value) || -Infinity,
+                ctrl_sd_max: parseFloat(document.getElementById('ctrl_sd_max').value) || Infinity,
+                ctrl_cd_min: parseFloat(document.getElementById('ctrl_cd_min').value) || -Infinity,
+                ctrl_cd_max: parseFloat(document.getElementById('ctrl_cd_max').value) || Infinity,
+            };
+
+            // Save to LocalStorage
+            localStorage.setItem('match_analytics_control_config', JSON.stringify(controlConfig));
+            
+            // Switch tab and render
+            switchTab('matches_control');
+            // Show toast or alert?
+            // alert("Settings saved locally! Simulating Google Sheet save...");
+        }
+
+        function loadControlSettings() {
+            // Helper to set value if not +/- Infinity
+            const setVal = (id, val) => {
+                if (val !== undefined && val !== null && val !== Infinity && val !== -Infinity) {
+                    document.getElementById(id).value = val;
+                }
+            };
+            
+            const c = controlConfig;
+            setVal('ctrl_conf_min', c.ctrl_conf_min); setVal('ctrl_conf_max', c.ctrl_conf_max);
+            setVal('ctrl_goals_min', c.ctrl_goals_min); setVal('ctrl_goals_max', c.ctrl_goals_max);
+            setVal('ctrl_prob_min', c.ctrl_prob_min); setVal('ctrl_prob_max', c.ctrl_prob_max);
+            
+            setVal('ctrl_home_odds_min', c.ctrl_home_odds_min); setVal('ctrl_home_odds_max', c.ctrl_home_odds_max);
+            setVal('ctrl_draw_odds_min', c.ctrl_draw_odds_min); setVal('ctrl_draw_odds_max', c.ctrl_draw_odds_max);
+            setVal('ctrl_away_odds_min', c.ctrl_away_odds_min); setVal('ctrl_away_odds_max', c.ctrl_away_odds_max);
+
+            setVal('ctrl_h2h_h_min', c.ctrl_h2h_h_min); setVal('ctrl_h2h_h_max', c.ctrl_h2h_h_max);
+            setVal('ctrl_h2h_a_min', c.ctrl_h2h_a_min); setVal('ctrl_h2h_a_max', c.ctrl_h2h_a_max);
+            
+            setVal('ctrl_hp_min', c.ctrl_hp_min); setVal('ctrl_hp_max', c.ctrl_hp_max);
+            setVal('ctrl_ap_min', c.ctrl_ap_min); setVal('ctrl_ap_max', c.ctrl_ap_max);
+
+            setVal('ctrl_power_diff_min', c.ctrl_power_diff_min); setVal('ctrl_power_diff_max', c.ctrl_power_diff_max);
+            setVal('ctrl_pos_diff_min', c.ctrl_pos_diff_min); setVal('ctrl_pos_diff_max', c.ctrl_pos_diff_max);
+
+            setVal('ctrl_fd_min', c.ctrl_fd_min); setVal('ctrl_fd_max', c.ctrl_fd_max);
+            setVal('ctrl_sd_min', c.ctrl_sd_min); setVal('ctrl_sd_max', c.ctrl_sd_max);
+            setVal('ctrl_cd_min', c.ctrl_cd_min); setVal('ctrl_cd_max', c.ctrl_cd_max);
         }
 
         // --- Rendering ---
@@ -1042,7 +1317,6 @@
                     if (isWin && !isUpcoming) {
                         tr.classList.add('correct-prediction');
                     } else {
-                         // Subtle Alternating Row Colors if not correct
                         if (index % 2 === 0) {
                             tr.classList.add('bg-blue-50/30');
                         } else {
@@ -1076,7 +1350,7 @@
                     tr.innerHTML = `
                         <td class="px-5 py-4 whitespace-nowrap text-navy-900 font-bold">${row['Date']}</td>
                         <td class="px-5 py-4 text-center whitespace-nowrap">
-                            <button class="text-navy-900 hover:text-white hover:bg-brand-blue bg-white border border-gray-200 hover:border-brand-blue px-3 py-1.5 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1 mx-auto text-xs font-bold" onclick="viewMatch(${allData.indexOf(row)})">
+                            <button class="text-navy-900 hover:text-white hover:bg-brand-blue bg-white border border-gray-200 hover:border-brand-blue px-3 py-1.5 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1 mx-auto text-xs font-bold" onclick="viewMatch('${row['MatchKey']}')">
                                 <span>View</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
                             </button>
                         </td>
@@ -1294,6 +1568,7 @@
             const select = document.getElementById(id);
             const values = [...new Set(allData.map(d => d[key]))].sort().filter(v => v);
             
+            // Keep first option (placeholder)
             select.innerHTML = select.options[0].outerHTML;
             values.forEach(v => {
                 const opt = document.createElement('option');
@@ -1325,8 +1600,11 @@
         }
 
         // --- Modals ---
-        function viewMatch(index) {
-            const d = allData[index];
+        function viewMatch(matchKey) {
+            // Find row by MatchKey (updated logic from index lookup to Key lookup for robustness)
+            const d = allData.find(row => row['MatchKey'] === matchKey); 
+            // Fallback for button if needed, but we use MatchKey now
+            
             if (!d) return;
 
             // Header
