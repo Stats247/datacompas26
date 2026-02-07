@@ -230,12 +230,12 @@
                         <i class="fa-solid fa-filter-circle-dollar text-orange-400"></i> Control
                     </button>
                     
-                    <!-- NEW TABS -->
+                    <!-- NEW TABS: RENAMED -->
                     <button id="tabStatareaAll" class="nav-tab inactive text-gray-400 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('statarea_all')">
-                        <i class="fa-solid fa-globe text-cyan-300"></i> SA All
+                        <i class="fa-solid fa-globe text-cyan-300"></i> Statarea All Matches
                     </button>
                     <button id="tabStatareaBest" class="nav-tab inactive text-gray-400 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2" onclick="switchTab('statarea_best')">
-                        <i class="fa-solid fa-crown text-yellow-300"></i> SA Best
+                        <i class="fa-solid fa-crown text-yellow-300"></i> Statarea Best
                     </button>
                     <!-- END NEW TABS -->
 
@@ -510,12 +510,19 @@
                         <i class="fa-solid fa-download"></i> Export
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <!-- Date -->
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Date</label>
                         <select id="sa_filterDate" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500" onchange="applyStatareaFilters()">
                             <option value="">All Dates</option>
+                        </select>
+                    </div>
+                    <!-- NEW TIP FILTER -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tip</label>
+                        <select id="sa_filterTip" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500" onchange="applyStatareaFilters()">
+                            <option value="">All Tips</option>
                         </select>
                     </div>
                     <!-- Home Prob -->
@@ -545,7 +552,7 @@
                 </div>
             </div>
 
-            <!-- STATAREA CARDS -->
+            <!-- STATAREA CARDS RESTORED -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-cyan-500">
                     <p class="text-[10px] text-gray-400 uppercase font-bold">Total Matches</p>
@@ -989,6 +996,7 @@
 
                 // Populate Filter Dropdowns (Statarea)
                 populateDropdown('sa_filterDate', 'Date', statareaData);
+                populateDropdown('sa_filterTip', 'Tip', statareaData); // New
 
                 applyFilters(); // Initial render
             } catch (error) {
@@ -1344,6 +1352,8 @@
         // --- SATAREA Filtering Logic ---
         function applyStatareaFilters() {
             const date = document.getElementById('sa_filterDate').value;
+            const tipVal = document.getElementById('sa_filterTip').value; // New
+
             const hMin = parseFloat(document.getElementById('sa_h_min').value) || -Infinity;
             const hMax = parseFloat(document.getElementById('sa_h_max').value) || Infinity;
             const dMin = parseFloat(document.getElementById('sa_d_min').value) || -Infinity;
@@ -1373,6 +1383,7 @@
 
                 // 2. User Input Filters
                 if (date && row['Date'] !== date) return false;
+                if (tipVal && row['Tip'] !== tipVal) return false; // New Tip Filter
 
                 const rowHP = parseFloat(row['Home Probability']) || 0;
                 if (rowHP < hMin || rowHP > hMax) return false;
@@ -1408,7 +1419,7 @@
                 if (status === 'UPCOMING') upcoming++;
             });
 
-            // Update Cards
+            // Update Cards (RESTORED)
             document.getElementById('sa_total').innerText = total;
             document.getElementById('sa_won').innerText = won;
             document.getElementById('sa_upcoming').innerText = upcoming;
