@@ -582,6 +582,11 @@
                                 <th class="px-5 py-4 text-left text-xs font-bold uppercase whitespace-nowrap">Time</th>
                                 <th class="px-5 py-4 text-left text-xs font-bold uppercase whitespace-nowrap">Home Team</th>
                                 <th class="px-5 py-4 text-left text-xs font-bold uppercase whitespace-nowrap">Away Team</th>
+                                <!-- NEW COLUMNS -->
+                                <th class="px-5 py-4 text-center text-xs font-bold uppercase whitespace-nowrap">Home %</th>
+                                <th class="px-5 py-4 text-center text-xs font-bold uppercase whitespace-nowrap">Draw %</th>
+                                <th class="px-5 py-4 text-center text-xs font-bold uppercase whitespace-nowrap">Away %</th>
+                                <!-- END NEW COLUMNS -->
                                 <th class="px-5 py-4 text-center text-xs font-bold uppercase whitespace-nowrap">Tip</th>
                                 <th class="px-5 py-4 text-center text-xs font-bold uppercase whitespace-nowrap">Result</th>
                             </tr>
@@ -1435,23 +1440,54 @@
             document.getElementById('sa_pgEnd').innerText = Math.min(end, total);
             document.getElementById('sa_pgTotal').innerText = total;
 
+            // Helper function for probability color intensity
+            function getProbabilityStyle(value, isActive) {
+                if (!isActive) return '';
+                const val = parseFloat(value) || 0;
+                // Calculate opacity based on probability (20-90 scale roughly)
+                // Normalize 20-90 range to 0.2 - 1.0 alpha
+                // Ensure min alpha 0.2, max 1.0
+                const normalized = Math.max(0, Math.min(100, val));
+                const alpha = Math.max(0.2, normalized / 100);
+                
+                // Text color: White if intensity is high (>60%), Black otherwise
+                const textColor = val > 60 ? 'white' : '#0f172a';
+                
+                // Using exact green shade requested (deep green is 700, light is 100)
+                // We use rgba for intensity control
+                return `background-color: rgba(22, 163, 74, ${alpha}); color: ${textColor}; font-weight: bold;`;
+            }
+
             pageData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
                 
                 const res = row['Match Result'] || '-';
-                const tip = row['Tip'];
+                const tip = (row['Tip'] || '').toString().trim().toUpperCase();
                 const status = getStatareaStatus(res, tip);
                 
-                // Color Logic
-                if (status === 'WIN') tr.classList.add('bg-green-100', 'hover:bg-green-200');
-                // if (status === 'LOSS') tr.classList.add('bg-red-50'); // Optional
+                const hp = row['Home Probability'] || 0;
+                const dp = row['Draw Probability'] || 0;
+                const ap = row['Away Probability'] || 0;
 
+                // Color Logic for Probabilities based on Tip
+                const styleH = getProbabilityStyle(hp, tip.includes('1'));
+                const styleD = getProbabilityStyle(dp, tip.includes('X'));
+                const styleA = getProbabilityStyle(ap, tip.includes('2'));
+
+                // Color Logic for Row Result
+                if (status === 'WIN') tr.classList.add('bg-green-50', 'hover:bg-green-100');
+                
                 tr.innerHTML = `
                     <td class="px-5 py-3 whitespace-nowrap text-navy-900 font-medium">${row['Date']}</td>
                     <td class="px-5 py-3 whitespace-nowrap text-gray-500">${row['Time']}</td>
                     <td class="px-5 py-3 whitespace-nowrap font-bold text-navy-900">${row['Home Team'] || row['Home team']}</td>
                     <td class="px-5 py-3 whitespace-nowrap font-bold text-navy-900">${row['Away Team'] || row['Away team']}</td>
+                    
+                    <td class="px-5 py-3 text-center whitespace-nowrap" style="${styleH}">${hp}</td>
+                    <td class="px-5 py-3 text-center whitespace-nowrap" style="${styleD}">${dp}</td>
+                    <td class="px-5 py-3 text-center whitespace-nowrap" style="${styleA}">${ap}</td>
+
                     <td class="px-5 py-3 text-center font-bold text-blue-600 bg-blue-50/50">${tip}</td>
                     <td class="px-5 py-3 text-center font-mono font-bold text-navy-900">${res}</td>
                 `;
